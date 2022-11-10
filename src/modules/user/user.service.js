@@ -1,3 +1,4 @@
+const { sequelize } = require('../../database/models');
 const db = require('../../database/models');
 const Op = db.Sequelize.Op;
 const { BadRequestException,UnauthorizedException } = require('../../helpers/errorResponse');
@@ -18,9 +19,16 @@ exports.addImageKey = async(e,key) => {
 };
 
 exports.addUser = async(e,info) => {
-    await db.User.create({email : e});
+    const user = await db.User.create({email : e});
     await db.User.update(info,{where : {email : e}});
     await db.Invite.update({RegStatus : 'completed'},{where : {email : e}});
+
+    const data = {
+        RegStatus : 'complete',
+        RegisteredAt : sequelize.literal('CURRENT_TIMESTAMP'),
+        UserId : user.UserId
+    };
+    await db.Activity.update(data,{ where : { email : e}})
 };
 
 exports.getResponse = async(e) => {

@@ -12,7 +12,7 @@ const adminSchema = {
         query: Joi.object().keys({
             page: Joi.number().integer().allow('',null).default(1),
             size: Joi.number().integer().allow('',null).default(3),
-            sort_column : Joi.string().valid("_id","firstName","lastName","email","phone").allow('',null),
+            sort_column : Joi.string().valid("UserId","firstName","lastName","email","phone").allow('',null),
             sort_order : Joi.string().valid("ASC","DESC",'').default("ASC").optional(),
             query: Joi.string().allow(''),
         }),

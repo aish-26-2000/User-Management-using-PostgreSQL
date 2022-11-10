@@ -1,18 +1,31 @@
+const { sequelize, Sequelize } = require('../../database/models');
 const db = require('../../database/models');
 const Op = db.Sequelize.Op;
-const operatorsAliases = {
-    $like: Op.like,
-    $not: Op.not
-  }
 const { getAccessURL } = require('../../utils/s3helper');
 
 exports.addInvite = async(data) => {
     const response = await db.Invite.create({email : data})
+    const status = {
+        email : data,
+        InviteStatus : 'sent',
+        InviteSentAt : sequelize.literal('CURRENT_TIMESTAMP'),
+        InviteId : response.InviteId
+    };
+    await db.Activity.create(status)
 
     return {
         id : response._id,
         email : response.email
     };
+};
+
+exports.SetInviteStatus = async(data) => {
+    const status = {
+        email : data,
+        InviteStatus : 'fail'
+    }
+
+    await db.Activity.create(data)
 };
 
 exports.authCheck = (username,password) => {
@@ -77,7 +90,7 @@ exports.getAllUsers = async(page,size,sort_column,sort_order,query) => {
     const { limit,offset } = Pagination(page,size);
     
     const users = await db.User.findAndCountAll({ 
-    attributes:['id','firstName','lastName','email','phone','imageKey'],
+    attributes:['UserId','firstName','lastName','email','phone','imageKey'],
     where: {
         [Op.or]: [
         {firstName: { [Op.like]: '%' + query + '%' }},
@@ -85,7 +98,7 @@ exports.getAllUsers = async(page,size,sort_column,sort_order,query) => {
         {email: { [Op.like]: '%' + query + '%' }}
         ]
       },
-    order: [[sort_column || 'id',sort_order || 'ASC']], 
+    order: [[sort_column || 'UserId',sort_order || 'ASC']], 
     limit,
     offset
     })
@@ -96,29 +109,32 @@ exports.getAllUsers = async(page,size,sort_column,sort_order,query) => {
 
 exports.getUserInfo = async(id) => {
     const user = await db.User.findOne({
-        where : {id : id},
-        attributes:['id','firstName','lastName','email','phone','imageKey']
+        where : {UserId : id},
+        attributes:['UserId','firstName','lastName','email','phone','imageKey']
+    })
+
+    if(user) {
+        if(user.imageKey !== null) {
+            const image = await getAccessURL(user.imageKey)
+            return {
+                id : user.UserId,
+                firstName : user.firstName,
+                lastName : user.lastName,
+                email : user.email,
+                phone : user.phone,
+                imageURl : image
+            };
+        } else {
+            return user;
+        };
+    };    
+};
+
+exports.getUserHistory = async(id) => {
+    const user = await db.Activity.findOne({
+        where : { Id : id },
+        attributes:['Id','email','InviteStatus','RegStatus','IdVerification','KYCStatus','MembershipStatus']
     })
 
     return user;
-};
-
-exports.getUserHistory = async(email) => {
-    const user = await db.Invite.findOne({where : { email : email }})
-
-    if(user){
-        return {
-            user_status : `${user.active} [true : active]`,
-            email_invitation : {
-                status : "sent",
-                sentAt :  String(user.createdAt)
-            },
-            personal_profile : {
-                status : user.regStatus,
-                registeredAt :  String(user.updatedAt)
-            }      
-        }
-        
-    };
-
 };

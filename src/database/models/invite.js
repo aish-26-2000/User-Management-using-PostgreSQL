@@ -6,34 +6,23 @@ module.exports = (sequelize, DataTypes) => {
         // This method is not a part of Sequelize lifecycle.
         // The `models/index` file will call this method automatically.
         static associate(model) {
-            Invite.hasMany(model.User, { foreignKey: 'userId', as: 'invites' });
+            Invite.hasMany(model.Activity,{ foreignKey: 'InviteId' });
         }
     }
     Invite.init(
         {
-            id: {
+            InviteId: {
                 allowNull: false,
                 autoIncrement: true,
                 primaryKey: true,
                 type: DataTypes.BIGINT,
-            },
-            userId: {
-                type: DataTypes.BIGINT,
-                references: {
-                    model: 'Users',
-                    key: 'id',
-                },
-                constrains: true,
-                onUpdate: 'cascade',
-                onDelete: 'cascade',
             },
             email: {
                 type: DataTypes.STRING,
                 unique: true,
             },
             RegStatus: {
-                type: DataTypes.STRING,
-                enum : ['pending','completed'],
+                type: DataTypes.ENUM('pending','completed'),
                 defaultValue : 'pending'
             },
             active: {

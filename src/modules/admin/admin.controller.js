@@ -27,9 +27,10 @@ exports.basicAuth = async(req,res,next) => {
 
 
 exports.sendInvite = async(req,res,next) => {
+    const email = req.body.email;
    try {
         //generate accesstoken and URL
-        const accessToken = jwt.generateAccessToken(req.body.email);
+        const accessToken = jwt.generateAccessToken(email);
         const registerURL = `${req.protocol}://${req.get('host')}/api/v1/user/register/${accessToken}`;
 
         //compose email
@@ -51,19 +52,20 @@ exports.sendInvite = async(req,res,next) => {
         //send invitation email
         await sendmail({
             from : 'ADMIN <admin@standardc.com>',
-            to : req.body.email,
+            to : email,
             subject : 'Welcome to StandardC',
             html,
             message
         });
 
         //add invite to db
-        await adminService.addInvite(req.body.email);
+        await adminService.addInvite(email);
         
         //response
-        responseHelper.success(res,`Invite sent successfully to user ${req.body.email}`);
+        responseHelper.success(res,`Invite sent successfully to user [${email}]`);
         
     } catch (err){
+        await adminService.SetInviteStatus(email)
         next(responseHelper.fail(res,`${err}`));
     }
 };
@@ -152,7 +154,8 @@ exports.userList = async(req,res,next) => {
         };
 
     } catch(err) {
-        next(responseHelper.fail(res,`${err}`));
+        //next(responseHelper.fail(res,`${err}`));
+        next(err);
     }
 };
 
@@ -177,15 +180,15 @@ exports.userDetails = async(req,res,next) => {
 
 exports.userHistory = async(req,res,next) => {
     try{
-        const email = req.query.email;
-        const details = await adminService.getUserHistory(email)
+        const id = req.query.Id;
+        const details = await adminService.getUserHistory(id)
 
         if(details){
             responseHelper.success(res,details,'User Status.')
         };
 
         if(!details){
-            responseHelper.fail(res,'Error, Check inputs and try again.')
+            responseHelper.fail(res,'Error, User not found.')
         };
     } catch(err){
         next(responseHelper.fail(res,`${err}`));
