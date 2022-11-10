@@ -1,0 +1,47 @@
+{
+  "name": "user-management-using-postgresql",
+  "version": "1.0.0",
+  "description": "User management module using postgresql",
+  "main": "app.js",
+  "bin": {
+    "user-management-using-postgresql": "bin/www.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon ./bin/www"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "sequelize",
+    "postgresql"
+  ],
+  "author": "Aish",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.1250.0",
+    "bcrypt": "^5.1.0",
+    "date-fns": "^2.29.3",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-fileupload": "^1.4.0",
+    "joi": "^17.7.0",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "node": "^19.0.1",
+    "node-cron": "^3.0.2",
+    "nodemailer": "^6.8.0",
+    "nodemon": "^2.0.20",
+    "pg": "^8.8.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.25.5",
+    "winston": "^3.8.2",
+    "winston-daily-rotate-file": "^4.7.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.27.0",
+    "eslint-config-prettier": "^8.5.0",
+    "prettier": "^2.7.1"
+  }
+}
