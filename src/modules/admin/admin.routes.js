@@ -7,7 +7,8 @@ const router = express.Router();
 
 router.use(adminController.basicAuth);
 
-router.get('/getAllUsers',validationMiddleware(adminSchema.list),adminController.userList);
+router.get('/getAllUsers',validationMiddleware(adminSchema.userList),adminController.userList);
+router.get('/getAllInvites',validationMiddleware(adminSchema.inviteList),adminController.invitesList);
 router.get('/getUserDetails',adminController.userDetails);
 router.get('/getUserHistory',adminController.userHistory);
 

@@ -138,3 +138,33 @@ exports.getUserHistory = async(id) => {
 
     return user;
 };
+
+exports.getAllInvites = async(page,size) => {
+
+    const Pagination = (page, size) => {
+        const limit = size ? +size : 3;
+        const offset = page ? page * limit : 0;
+        return { limit, offset};
+    };
+    const getPagingData = (data, page, limit) => {
+        const { count: totalItems, rows: InviteDetails} = data;
+        const currentPage = page ? +page : 0;
+        const totalPages = Math.ceil(totalItems / limit);
+        return { totalItems, InviteDetails, totalPages, currentPage };
+    };
+
+    const { limit,offset } = Pagination(page,size);
+    
+    const invites = await db.Invite.findAndCountAll({ 
+    attributes:['InviteId','email','active'],
+    limit,
+    offset,
+    include: [
+        {model: db.Activity,
+        attributes:['InviteStatus','RegStatus','IdVerification','KYCStatus','MembershipStatus']
+    }]
+    })
+
+    const response = getPagingData(invites,page,limit);
+    return response;
+};

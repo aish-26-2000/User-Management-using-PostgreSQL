@@ -65,7 +65,7 @@ exports.sendInvite = async(req,res,next) => {
         responseHelper.success(res,`Invite sent successfully to user [${email}]`);
         
     } catch (err){
-        await adminService.SetInviteStatus(email)
+        //await adminService.SetInviteStatus(email)
         next(responseHelper.fail(res,`${err}`));
     }
 };
@@ -193,4 +193,23 @@ exports.userHistory = async(req,res,next) => {
     } catch(err){
         next(responseHelper.fail(res,`${err}`));
     };
+};
+
+exports.invitesList = async(req,res,next) => {
+    try {
+        const { page,size } = req.query;
+
+        const invites = await adminService.getAllInvites(page,size)
+        if(invites){
+            responseHelper.success(res,invites,'Invite Details');
+        };
+
+        if(!invites){
+            responseHelper.fail(res,'Error, Data not found');
+        };
+
+    } catch(err) {
+        //next(responseHelper.fail(res,`${err}`));
+        next(err);
+    }
 };

@@ -8,7 +8,7 @@ const adminSchema = {
         }),
     },
 
-    list: {
+    userList: {
         query: Joi.object().keys({
             page: Joi.number().integer().allow('',null).default(1),
             size: Joi.number().integer().allow('',null).default(3),
@@ -16,6 +16,13 @@ const adminSchema = {
             sort_order : Joi.string().valid("ASC","DESC",'').default("ASC").optional(),
             query: Joi.string().allow(''),
         }),
+    },
+
+    inviteList: {
+        query: Joi.object().keys({
+            page: Joi.number().integer().allow('',null).default(1),
+            size: Joi.number().integer().allow('',null).default(3),
+        })
     },
 
     login: {
