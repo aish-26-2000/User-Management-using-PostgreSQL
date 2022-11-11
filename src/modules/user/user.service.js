@@ -1,6 +1,8 @@
 const { sequelize } = require('../../database/models');
 const db = require('../../database/models');
 const Op = db.Sequelize.Op;
+const { bcrypt,jwt } = require('../../utils');
+const { MESSAGES, CONSTANTS } = require('../../config');
 const { BadRequestException,UnauthorizedException } = require('../../helpers/errorResponse');
 
 exports.findUser = async(e) => {
@@ -54,6 +56,8 @@ exports.login = async (params) => {
     if (!passwordMatch) throw new BadRequestException(MESSAGES.USER.LOGIN.INVALID_CREDS);
 
     const accessToken = jwt.generateAccessToken({ id: user.id, email: user.email});
+
+    await db.Activity.update({LastLoginAt : sequelize.literal('CURRENT_TIMESTAMP')},{ where: {email : email}})
 
     return {
         success: true,

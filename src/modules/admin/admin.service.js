@@ -133,7 +133,7 @@ exports.getUserInfo = async(id) => {
 exports.getUserHistory = async(id) => {
     const user = await db.Activity.findOne({
         where : { Id : id },
-        attributes:['Id','email','InviteStatus','RegStatus','IdVerification','KYCStatus','MembershipStatus']
+        attributes:['Id','email','InviteStatus','RegStatus','IdVerification','KYCStatus','MembershipStatus','LastLoginAt']
     })
 
     return user;
@@ -161,7 +161,7 @@ exports.getAllInvites = async(page,size) => {
     offset,
     include: [
         {model: db.Activity,
-        attributes:['InviteStatus','RegStatus','IdVerification','KYCStatus','MembershipStatus']
+        attributes:['InviteStatus','RegStatus','IdVerification','KYCStatus','MembershipStatus','LastLoginAt']
     }]
     })
 

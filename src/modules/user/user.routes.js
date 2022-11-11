@@ -14,6 +14,6 @@ router.use('/register/:token',upload({
     },
 }));
 router.post('/register/:token',validationMiddleware(userSchema.register),userController.Register);
-
+router.post('/login',validationMiddleware(userSchema.login),userController.login);
 
 module.exports = router;
