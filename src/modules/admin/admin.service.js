@@ -63,14 +63,22 @@ exports.unrestrict = async(e) => {
 };
 
 exports.removeUser = async(e) => {
-    await db.Invite.destroy({
-        where : { email : e },
-        force : true
-    })
-    await db.User.destroy({
-        where : { email : e },
-        force : true
-    })
+    const t = await sequelize.transaction();
+    try {
+        await db.Invite.destroy({
+            where : { email : e },
+            force : true
+        },{ transaction: t })
+        await db.User.destroy({
+            where : { email : e },
+            force : true
+        },{ transaction: t })
+
+        await t.commit();
+
+    } catch (err) {
+        await t.rollback();
+    }
 }; 
 
 exports.getAllUsers = async(page,size,sort_column,sort_order,query) => {
@@ -133,7 +141,7 @@ exports.getUserInfo = async(id) => {
 exports.getUserHistory = async(id) => {
     const user = await db.Activity.findOne({
         where : { Id : id },
-        attributes:['Id','email','InviteStatus','RegStatus','IdVerification','KYCStatus','MembershipStatus']
+        attributes:['Id','email','InviteStatus','RegStatus','IdVerification','KYCStatus','MembershipStatus','LastLoginAt']
     })
 
     return user;
@@ -161,7 +169,7 @@ exports.getAllInvites = async(page,size) => {
     offset,
     include: [
         {model: db.Activity,
-        attributes:['InviteStatus','RegStatus','IdVerification','KYCStatus','MembershipStatus']
+        attributes:['InviteStatus','RegStatus','IdVerification','KYCStatus','MembershipStatus','LastLoginAt']
     }]
     })
 

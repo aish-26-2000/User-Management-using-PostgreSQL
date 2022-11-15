@@ -1,6 +1,8 @@
 const { sequelize } = require('../../database/models');
 const db = require('../../database/models');
 const Op = db.Sequelize.Op;
+const { bcrypt,jwt } = require('../../utils');
+const { MESSAGES, CONSTANTS } = require('../../config');
 const { BadRequestException,UnauthorizedException } = require('../../helpers/errorResponse');
 
 exports.findUser = async(e) => {
@@ -19,16 +21,24 @@ exports.addImageKey = async(e,key) => {
 };
 
 exports.addUser = async(e,info) => {
-    const user = await db.User.create({email : e});
-    await db.User.update(info,{where : {email : e}});
-    await db.Invite.update({RegStatus : 'completed'},{where : {email : e}});
+    const t = await sequelize.transaction();
+    try{
+        const user = await db.User.create({email : e},{ transaction: t });
+        await db.User.update(info,{where : {email : e}},{ transaction: t });
+        await db.Invite.update({RegStatus : 'completed'},{where : {email : e}},{ transaction: t });
 
-    const data = {
-        RegStatus : 'complete',
-        RegisteredAt : sequelize.literal('CURRENT_TIMESTAMP'),
-        UserId : user.UserId
-    };
-    await db.Activity.update(data,{ where : { email : e}})
+        const data = {
+            RegStatus : 'complete',
+            RegisteredAt : sequelize.literal('CURRENT_TIMESTAMP'),
+            UserId : user.UserId
+        };
+        await db.Activity.update(data,{ where : { email : e}},{ transaction: t })
+
+        await t.commit();
+
+    } catch(error) {
+        await t.rollback();
+    }
 };
 
 exports.getResponse = async(e) => {
@@ -54,6 +64,8 @@ exports.login = async (params) => {
     if (!passwordMatch) throw new BadRequestException(MESSAGES.USER.LOGIN.INVALID_CREDS);
 
     const accessToken = jwt.generateAccessToken({ id: user.id, email: user.email});
+
+    await db.Activity.update({LastLoginAt : sequelize.literal('CURRENT_TIMESTAMP')},{ where: {email : email}})
 
     return {
         success: true,
