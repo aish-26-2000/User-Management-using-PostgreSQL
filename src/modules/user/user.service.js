@@ -21,16 +21,24 @@ exports.addImageKey = async(e,key) => {
 };
 
 exports.addUser = async(e,info) => {
-    const user = await db.User.create({email : e});
-    await db.User.update(info,{where : {email : e}});
-    await db.Invite.update({RegStatus : 'completed'},{where : {email : e}});
+    const t = await sequelize.transaction();
+    try{
+        const user = await db.User.create({email : e},{ transaction: t });
+        await db.User.update(info,{where : {email : e}},{ transaction: t });
+        await db.Invite.update({RegStatus : 'completed'},{where : {email : e}},{ transaction: t });
 
-    const data = {
-        RegStatus : 'complete',
-        RegisteredAt : sequelize.literal('CURRENT_TIMESTAMP'),
-        UserId : user.UserId
-    };
-    await db.Activity.update(data,{ where : { email : e}})
+        const data = {
+            RegStatus : 'complete',
+            RegisteredAt : sequelize.literal('CURRENT_TIMESTAMP'),
+            UserId : user.UserId
+        };
+        await db.Activity.update(data,{ where : { email : e}},{ transaction: t })
+
+        await t.commit();
+
+    } catch(error) {
+        await t.rollback();
+    }
 };
 
 exports.getResponse = async(e) => {
