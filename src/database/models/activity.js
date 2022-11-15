@@ -36,8 +36,14 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.DATE,                
             },
             IdVerification: {
-                type: DataTypes.ENUM('pending','complete'),
+                type: DataTypes.ENUM('pending','pass'),
                 defaultValue : 'pending'
+            },
+            IdVerifiedAt: {
+                type: DataTypes.DATE,                
+            },
+            IdVerifiedBy: {
+                type: DataTypes.STRING
             },
             KYCStatus : {
                 type: DataTypes.ENUM('pending','complete'),

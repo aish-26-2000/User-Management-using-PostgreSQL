@@ -25,7 +25,7 @@ exports.SetInviteStatus = async(data) => {
         InviteStatus : 'fail'
     }
 
-    await db.Activity.create(data)
+    await db.Activity.create(status)
 };
 
 exports.authCheck = (username,password) => {
@@ -199,4 +199,28 @@ exports.getAllInvites = async(page,size) => {
 
     const response = getPagingData(invites,page,limit);
     return response;
+};
+
+exports.verifyId = async(id,admin) => {
+    const t = await sequelize.transaction();
+    try {
+        const user = await db.Activity.findOne({
+            where : {UserId : id},
+        },{ transaction: t })
+        if(user) {
+            const data = {
+                IdVerification : 'pass',
+                IdVerifiedAt : sequelize.literal('CURRENT_TIMESTAMP'),
+                IdVerifiedBy : admin
+            }
+    
+            await db.Activity.update(data,{ where : { UserId : id }},{ transaction: t })
+
+            return "ok";
+        };
+        await t.commit();
+    } catch(err) {
+        await t.rollback();
+        console.log(err);
+    }
 };

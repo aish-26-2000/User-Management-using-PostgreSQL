@@ -15,6 +15,8 @@ router.get('/getUserHistory',adminController.userHistory);
 
 router.post('/invite',validationMiddleware(adminSchema.invite),adminController.sendInvite);
 router.post('/resendInvite',validationMiddleware(adminSchema.invite),adminController.resendInvite);
+router.post('/verify',adminController.idVerification);
+
 
 router.post('/restrict',adminController.restrictUser);
 router.post('/unrestrict',adminController.unrestrictUser);
