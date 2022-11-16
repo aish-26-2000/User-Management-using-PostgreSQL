@@ -25,6 +25,9 @@ router.post('/unrestrict',adminController.unrestrictUser);
 
 //terms and conditions
 router.post('/add',agrController.addNewAgreement);
+router.get('/getAgreements',agrController.getAgreements);
+router.get('/getBusinessAgreements',agrController.getAllBusinessAgreements);
+router.get('/getUserAgreements',agrController.getAllUserAgreements);
 
 
 module.exports = router;

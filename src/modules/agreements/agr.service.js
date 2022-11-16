@@ -15,3 +15,29 @@ exports.addAgreement = async(agreement) => {
         creator : response.createdBy
     };
 };
+
+exports.getAllAgreements = async() => {
+    const data = await db.Agreement.findAll({ 
+    order: [['priority','ASC']]
+    })
+
+    return data;
+}
+
+exports.getUserAgreements = async() => {
+    const response = await db.Agreement.findAll({
+        where : {agreement_type_code : 'GNUSR'},
+        order: [['priority','ASC']]
+    })
+
+    if(response) { return response; } 
+};
+
+exports.getBusinessAgreements = async() => {
+    const response = await db.Agreement.findAll({
+        where : {agreement_type_code : 'SCBUS'},
+        order: [['priority','ASC']]
+    })
+    
+    if(response) { return response; } 
+};

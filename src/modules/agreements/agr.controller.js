@@ -1,3 +1,4 @@
+const { count } = require('console');
 const { responseHelper } = require('../../helpers');
 const agrService = require('./agr.service');
 
@@ -18,7 +19,7 @@ exports.addNewAgreement = async(req,res,next) => {
         const response = await agrService.addAgreement(data)
 
         if(response) {
-            responseHelper.success(res,response,'Agreement added successfully')
+            responseHelper.success(res,response,'Agreement successfully added')
         };
 
         if(!response) {
@@ -27,5 +28,56 @@ exports.addNewAgreement = async(req,res,next) => {
 
     } catch(err) {
         next(responseHelper.fail(res,`${err}`));
+    };
+};
+
+exports.getAgreements = async(req,res,next) => {
+    try{
+        const response = await agrService.getAllAgreements()
+        
+        if(response){
+            responseHelper.success(res,response,'Success');
+        };
+
+        if(!response){
+            responseHelper.fail(res,'No agreements found.')
+        };
+
+    } catch(err) {
+        next(responseHelper.fail(res,`${err}`))
+    };
+};
+
+exports.getAllBusinessAgreements = async(req,res,next) => {
+    try{
+        const response = await agrService.getBusinessAgreements()
+
+        if(response){
+            responseHelper.success(res,response,'Success');
+        };
+
+        if(!response){
+            responseHelper.fail(res,'No agreements found.')
+        };
+
+    } catch(err) {
+        next(responseHelper.fail(res,`${err}`))
+    };
+};
+
+exports.getAllUserAgreements = async(req,res,next) => {
+    try{
+        const response = await agrService.getUserAgreements()
+
+        if(response){
+            responseHelper.success(res,response,'Success');
+        };
+
+        if(!response){
+            responseHelper.fail(res,'No agreements found.')
+        };
+
+    } catch(err) {
+        next(responseHelper.fail(res,`${err}`))
     };
 };
