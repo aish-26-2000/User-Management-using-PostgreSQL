@@ -43,7 +43,7 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.DATE,                
             },
             IdVerifiedBy: {
-                type: DataTypes.STRING
+                type: DataTypes.STRING,                
             },
             KYCStatus : {
                 type: DataTypes.ENUM('pending','complete'),
@@ -53,9 +53,17 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.ENUM('active','inactive'),
                 defaultValue : 'inactive'
             },
+            UserId: {
+                allowNull: false,
+                type: DataTypes.BIGINT,
+            },
+            InviteId: {
+                allowNull: false,
+                type: DataTypes.BIGINT,
+            },
             LastLoginAt: {
-                type: DataTypes.DATE,                            
-            }
+                type: DataTypes.DATE,                
+            },
         },
         {
             sequelize,
