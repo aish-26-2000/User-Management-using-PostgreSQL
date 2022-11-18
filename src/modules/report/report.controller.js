@@ -1,6 +1,6 @@
 const cron = require('node-cron');
 const date = require('date-fns');
-const { User, Invite } = require('../../database/models');
+const db = require('../../database/models')
 const sendEmail = require('../../utils/email');
 
 //get date 
@@ -23,11 +23,11 @@ const filter = async(model,filter) => {
 //send email
 exports.autoReport =  async() => {
     //counts
-    const inviteCount = await count(Invite);
-    const userCount = await count(User);
-    const regUserCount = await filter(Invite,{regStatus : "completed",createdAt : today });
-    const awaitingUserCount = await filter(Invite,{regStatus : "pending",createdAt : today});
-    const activeUserCount = await filter(Invite,{active : true,createdAt : today});
+    const inviteCount = await count(db.Invite);
+    const userCount = await count(db.User);
+    const regUserCount = await filter(db.Invite,{regStatus : "completed",createdAt : today });
+    const awaitingUserCount = await filter(db.Invite,{regStatus : "pending",createdAt : today});
+    const activeUserCount = await filter(db.Invite,{active : true,createdAt : today});
 
     const message = `This is an auto-generated email.\nStandardC User Registration Report \n\nDated On:${new Date()} \n 
                 Invite Mails : ${inviteCount} \n

@@ -63,6 +63,9 @@ exports.login = async (params) => {
     const passwordMatch = await bcrypt.verifyPassword(password, user.password);
     if (!passwordMatch) throw new BadRequestException(MESSAGES.USER.LOGIN.INVALID_CREDS);
 
+    const checkAgreements = await user.agreements
+    if(checkAgreements === false) throw new BadRequestException(MESSAGES.USER.LOGIN.AGREEMENTS);
+
     const accessToken = jwt.generateAccessToken({ id: user.id, email: user.email});
 
     await db.Activity.update({LastLoginAt : sequelize.literal('CURRENT_TIMESTAMP')},{ where: {email : email}})

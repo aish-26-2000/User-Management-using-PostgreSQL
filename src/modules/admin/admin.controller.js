@@ -228,7 +228,6 @@ exports.invitesList = async(req,res,next) => {
         };
 
     } catch(err) {
-        //next(responseHelper.fail(res,`${err}`));
-        next(err);
+        next(responseHelper.fail(res,`${err}`));
     }
 };

@@ -43,8 +43,12 @@ module.exports = (sequelize, DataTypes) => {
             imageKey: {
                 type: DataTypes.STRING,
                 allowNull: true
-
             },
+            agreements: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false,
+                allowNull : false
+            }
         },
         {
             sequelize,
