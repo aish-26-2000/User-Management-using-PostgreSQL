@@ -4,6 +4,8 @@ const Op = db.Sequelize.Op;
 const { bcrypt,jwt } = require('../../utils');
 const { MESSAGES, CONSTANTS } = require('../../config');
 const { BadRequestException,UnauthorizedException } = require('../../helpers/errorResponse');
+const { createEmailInviteEvent, createRegEvent, createAccEvent } = require('../history/history.service');
+const moment = require('moment/moment');
 
 exports.findUser = async(e) => {
     const user = await db.Invite.findOne({where : {email : e}})
@@ -20,32 +22,54 @@ exports.addImageKey = async(e,key) => {
     await db.User.update({imageKey : key},{where : {email : e}});
 };
 
-exports.addUser = async(e,info) => {
-    const t = await sequelize.transaction();
-    try {
-        const user = await db.User.create({email : e},{ transaction: t });
-        await db.User.update(info,{where : {email : e}},{ transaction: t });
-        await db.Invite.update({RegStatus : 'completed'},{where : {email : e}},{ transaction: t });
-
-        const data = {
-            RegStatus : 'complete',
-            RegisteredAt : sequelize.literal('CURRENT_TIMESTAMP'),
+exports.addPassword = async(email,password) => {
+    const user = await db.User.findOne({ where : { email : email }})
+    
+    if(user) {
+        const cred = await db.user_cred.create({
+            password : password,
+            createdBy : user.fullName,
+            updatedBy : user.fullName,
             UserId : user.UserId
-        };
-        await db.Activity.update(data,{ where : { email : e}},{ transaction: t })
-
-        await t.commit();
-
-    } catch(err) {
-        await t.rollback();
+        });
+    
+        return cred.user_cred_id;
     };
+};
+
+exports.addUser = async(e,info) => {
+    const user = await db.User.create({email : e});
+
+    await db.User.update({
+        firstName : info.firstName,
+        lastName : info.lastName,
+        phone : info.phone,
+        pass_changetime : new Date()
+    },
+    {where : {email : e}}
+    );
+    await this.addPassword(e,info.password)
+    
+    await db.Invite.update({RegStatus : 'completed'},{where : {email : e}});
+
+    const data = {
+        RegStatus : 'complete',
+        RegisteredAt : sequelize.literal('CURRENT_TIMESTAMP'),
+        UserId : user.UserId
+    };
+
+    await db.Activity.update(data,{ where : { email : e}});
+
+    await createEmailInviteEvent(e);
+    await createRegEvent(e);
+    await createAccEvent(e);
 };
 
 exports.getResponse = async(e) => {
     const userInfo = await db.User.findOne({where : {email : e}})
     
     return { 
-        id : userInfo.id,
+        id : userInfo.UserId,
         firstName : userInfo.firstName,
         lastName : userInfo.lastName,
         email : userInfo.email,
@@ -54,13 +78,22 @@ exports.getResponse = async(e) => {
     };
 };
 
-exports.login = async (params) => {
-    const { email, password } = params;
+exports.login = async (email,password) => {
 
     const user = await db.User.findOne({ where: { email } });
     if (!user) throw new BadRequestException(MESSAGES.USER.LOGIN.INVALID_CREDS);
 
-    const passwordMatch = await bcrypt.verifyPassword(password, user.password);
+    const passChangeInterval =  moment(user.pass_changetime).fromNow().slice(0,2); //this.calculateDateInterval(user.pass_changetime);
+
+    if(passChangeInterval > 7) return 'password expired';
+
+    const cred = await db.user_cred.findAll({
+         where : { UserId : user.UserId},
+         order: [['createdAt','DESC']]
+        })
+    let prev_pass = cred.map(pass => pass.password);
+
+    const passwordMatch = await bcrypt.verifyPassword(password, prev_pass[0]);
     if (!passwordMatch) throw new BadRequestException(MESSAGES.USER.LOGIN.INVALID_CREDS);
 
     const checkAgreements = await user.agreements
@@ -71,11 +104,61 @@ exports.login = async (params) => {
     await db.Activity.update({LastLoginAt : sequelize.literal('CURRENT_TIMESTAMP')},{ where: {email : email}})
 
     return {
-        success: true,
         id: user.id,
         name: user.name,
         email: user.email,
         accessToken,
+        passChangeInterval,
     };
+};
+
+
+exports.generatePasswordResetToken = async(email) => {
+    const user = await db.User.findOne({where : {email : email}});
+    
+    if(user) {
+        const resetToken = jwt.generateAccessToken(email)
+        return resetToken;
+    }
+};
+
+exports.updatePassword = async(email,oldPassword,newPassword) => {
+  const user = await db.User.findOne({ where : { email : email }});
+  
+  if(user) {
+    const cred = await db.user_cred.findAll({
+        where : { UserId : user.UserId},
+        order: [['createdAt','DESC']]
+       });
+    
+    const prev_pass = cred.map(ele => ele.password);
+
+    const verifyOldPassword = await bcrypt.verifyPassword(oldPassword, prev_pass[0]);
+    if (!verifyOldPassword) throw new BadRequestException(MESSAGES.USER.UPDATE_PASSWORD.OLD_PASSWORD);
+
+    if( await bcrypt.verifyPassword(newPassword,prev_pass[0]) === true){
+        throw new BadRequestException(MESSAGES.USER.UPDATE_PASSWORD.PASSWORD_MATCH)
+    };
+    if( await bcrypt.verifyPassword(newPassword,prev_pass[1]) === true){
+        throw new BadRequestException(MESSAGES.USER.UPDATE_PASSWORD.PASSWORD_MATCH)
+    };
+    if( await bcrypt.verifyPassword(newPassword,prev_pass[2]) === true){
+        throw new BadRequestException(MESSAGES.USER.UPDATE_PASSWORD.PASSWORD_MATCH)
+    };
+
+    const hashPassword = await bcrypt.hashPassword(newPassword);
+        await this.addPassword(email,hashPassword);
+        await db.User.update({pass_changetime :new Date() },{ where: {email : email}})
+        return 'ok';
+  };
+};
+
+exports.calculateDateInterval = (date) => {
+    const pass_changedAt = new Date(date);
+    const current_date = new Date();
+    const oneday = 1000*60*60*24;
+    const diff = current_date - pass_changedAt;
+    console.log(diff/oneday);
+    return (diff/oneday);
 };
 

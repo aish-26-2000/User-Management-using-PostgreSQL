@@ -54,11 +54,9 @@ module.exports = (sequelize, DataTypes) => {
                 defaultValue : 'inactive'
             },
             UserId: {
-                allowNull: false,
                 type: DataTypes.BIGINT,
             },
             InviteId: {
-                allowNull: false,
                 type: DataTypes.BIGINT,
             },
             LastLoginAt: {

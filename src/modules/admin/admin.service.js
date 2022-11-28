@@ -14,7 +14,7 @@ exports.addInvite = async(data) => {
     await db.Activity.create(status)
 
     return {
-        id : response._id,
+        id : response.InviteId,
         email : response.email
     };
 };
@@ -111,6 +111,7 @@ exports.getAllUsers = async(page,size,sort_column,sort_order,query) => {
     offset
     })
 
+    
     const response = getPagingData(users,page,limit);
     return response;
 };
@@ -118,57 +119,64 @@ exports.getAllUsers = async(page,size,sort_column,sort_order,query) => {
 exports.getUserInfo = async(id) => {
     const user = await db.User.findOne({
         where : {UserId : id},
-        attributes:['UserId','firstName','lastName','email','phone','imageKey']
+        attributes:['UserId','firstName','lastName','fullName','email','phone','imageKey','imageUrl']
     })
+
+    const activity = await this.getUserActivity(id);
 
     if(user) {
         if(user.imageKey !== null) {
-            const image = await getAccessURL(user.imageKey)
             return {
-                id : user.UserId,
-                firstName : user.firstName,
-                lastName : user.lastName,
-                email : user.email,
-                phone : user.phone,
-                imageURl : image
+                General_Details : {
+                    id : user.UserId,
+                    Name : user.fullName,
+                    email : user.email,
+                    phone : user.phone,
+                    imageKey : user.imageKey,
+                    imageURL : await user.imageUrl
+                },
+                User_Activity : activity
             };
         } else {
-            return user;
+            return {
+                General_Details : {
+                    id : user.UserId,
+                    Name : user.fullName,
+                    email : user.email,
+                    phone : user.phone,
+                },
+                User_Activity : activity
+               
+            };
         };
     };    
 };
 
-exports.getUserHistory = async(id) => {
+exports.getUserActivity = async(id) => {
     const user = await db.Activity.findOne({
         where : { Id : id },
     })
-
-    return {
-        Id : user.Id,
-        email : user.email,
-        inviteDetails : {
-            Status : user.InviteStatus,
-            InviteSentAt : user.InviteSentAt
-        },
-        regDetails : {
-            Status : user.RegStatus,
-            updatedAt : user.RegisteredAt
-        },
-        IdVerification : {
-            Status : user.IdVerification,
-            updatedAt : user.IdVerifiedAt,
-            updatedBy : user.IdVerifiedBy
-        },
-        KYC : {
-            Status : user.KYCStatus,
-        },
-        Membership : {
-            Status : user.MembershipStatus,
-        },
-        Login : {
-            LastLoginAt : user.LastLoginAt
-        }
-    };
+    if(user) {
+        return {
+            inviteDetails : {
+                Status : user.InviteStatus,
+                InviteSentAt : user.InviteSentAt
+            },
+            regDetails : {
+                Status : user.RegStatus,
+                updatedAt : user.RegisteredAt
+            },
+            IdVerification : {
+                Status : user.IdVerification,
+            },
+            KYC : {
+                Status : user.KYCStatus,
+            },
+            Membership : {
+                Status : user.MembershipStatus,
+            },
+        };
+    }
 };
 
 exports.getAllInvites = async(page,size) => {
@@ -223,4 +231,26 @@ exports.verifyId = async(id,admin) => {
         await t.rollback();
         console.log(err);
     }
+};
+
+exports.userHistory = async(id) => {
+    const user = await db.User.findOne({
+        where : {
+            UserId : id
+        }
+    });
+    
+    if(user) {
+       const events = await db.userActivity.findAll({
+        where : {
+            UserId : id,
+        },
+        attributes: ['user_activity_id','description','is_active','createdAt','createdBy','updatedAt','updatedBy','UserId']
+       });
+        return {
+            User_History : {
+                events
+            }
+        }
+    };
 };

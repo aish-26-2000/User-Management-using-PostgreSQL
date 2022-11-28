@@ -130,3 +130,20 @@ exports.getAllUserAgreements = async(req,res,next) => {
         next(responseHelper.fail(res,`${err}`))
     };
 };
+
+
+exports.updateUserConsent = async(req,res,next) => {
+    try {
+        const { userId, agreementId } = req.body;
+
+        const consent = await agrService.updateUserConsent(userId,agreementId);
+
+        if(!consent) {
+            responseHelper.fail(res,'Check inputs and Try Again')
+        };
+
+        responseHelper.success(res,consent,'Consent updated successfully');
+    } catch(err) {
+        next(responseHelper.fail(res,`${err}`))
+    }
+};

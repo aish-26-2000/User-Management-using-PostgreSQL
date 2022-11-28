@@ -197,18 +197,18 @@ exports.userDetails = async(req,res,next) => {
     };
 };
 
-exports.userHistory = async(req,res,next) => {
+exports.getUserHistory = async(req,res,next) => {
     try{
-        const id = req.query.Id;
-        const details = await adminService.getUserHistory(id)
+        const id = req.query.id;
 
-        if(details){
-            responseHelper.success(res,details,'User Status.')
+        const response = await adminService.userHistory(id);
+        
+        if(!response) {
+            responseHelper.fail(res,'User not found')
         };
 
-        if(!details){
-            responseHelper.fail(res,'Error, User not found.')
-        };
+        responseHelper.success(res,response,'Success')
+
     } catch(err){
         next(responseHelper.fail(res,`${err}`));
     };
@@ -231,3 +231,4 @@ exports.invitesList = async(req,res,next) => {
         next(responseHelper.fail(res,`${err}`));
     }
 };
+

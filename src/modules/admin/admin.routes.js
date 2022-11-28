@@ -12,7 +12,7 @@ router.use(adminController.basicAuth);
 router.get('/getAllUsers',validationMiddleware(adminSchema.userList),adminController.userList);
 router.get('/getAllInvites',validationMiddleware(adminSchema.inviteList),adminController.invitesList);
 router.get('/getUserDetails',adminController.userDetails);
-router.get('/getUserHistory',adminController.userHistory);
+router.get('/getUserHistory',adminController.getUserHistory);
 
 //invites and verification
 router.post('/invite',validationMiddleware(adminSchema.invite),adminController.sendInvite);
