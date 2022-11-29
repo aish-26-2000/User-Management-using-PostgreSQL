@@ -52,7 +52,7 @@
      switch (error.code) {
          case 'EACCES':
              logger.error({
-                 message: `${bind} requires elevated privileges`,
+                 message: `${bind} requires elevated privilegess`,
                  level: 'error',
              });
              process.exit(1);

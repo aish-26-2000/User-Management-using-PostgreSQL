@@ -14,7 +14,7 @@ exports.addInvite = async(data) => {
     await db.Activity.create(status)
 
     return {
-        id : response._id,
+        id : response.InviteId,
         email : response.email
     };
 };
@@ -25,7 +25,7 @@ exports.SetInviteStatus = async(data) => {
         InviteStatus : 'fail'
     }
 
-    await db.Activity.create(data)
+    await db.Activity.create(status)
 };
 
 exports.authCheck = (username,password) => {
@@ -63,14 +63,22 @@ exports.unrestrict = async(e) => {
 };
 
 exports.removeUser = async(e) => {
-    await db.Invite.destroy({
-        where : { email : e },
-        force : true
-    })
-    await db.User.destroy({
-        where : { email : e },
-        force : true
-    })
+    const t = await sequelize.transaction();
+    try {
+        await db.Invite.destroy({
+            where : { email : e },
+            force : true
+        },{ transaction: t })
+        await db.User.destroy({
+            where : { email : e },
+            force : true
+        },{ transaction: t })
+
+        await t.commit();
+
+    } catch (err) {
+        await t.rollback();
+    }
 }; 
 
 exports.getAllUsers = async(page,size,sort_column,sort_order,query) => {
@@ -103,6 +111,7 @@ exports.getAllUsers = async(page,size,sort_column,sort_order,query) => {
     offset
     })
 
+    
     const response = getPagingData(users,page,limit);
     return response;
 };
@@ -110,33 +119,64 @@ exports.getAllUsers = async(page,size,sort_column,sort_order,query) => {
 exports.getUserInfo = async(id) => {
     const user = await db.User.findOne({
         where : {UserId : id},
-        attributes:['UserId','firstName','lastName','email','phone','imageKey']
+        attributes:['UserId','firstName','lastName','fullName','email','phone','imageKey','imageUrl']
     })
+
+    const activity = await this.getUserActivity(id);
 
     if(user) {
         if(user.imageKey !== null) {
-            const image = await getAccessURL(user.imageKey)
             return {
-                id : user.UserId,
-                firstName : user.firstName,
-                lastName : user.lastName,
-                email : user.email,
-                phone : user.phone,
-                imageURl : image
+                General_Details : {
+                    id : user.UserId,
+                    Name : user.fullName,
+                    email : user.email,
+                    phone : user.phone,
+                    imageKey : user.imageKey,
+                    imageURL : await user.imageUrl
+                },
+                User_Activity : activity
             };
         } else {
-            return user;
+            return {
+                General_Details : {
+                    id : user.UserId,
+                    Name : user.fullName,
+                    email : user.email,
+                    phone : user.phone,
+                },
+                User_Activity : activity
+               
+            };
         };
     };    
 };
 
-exports.getUserHistory = async(id) => {
+exports.getUserActivity = async(id) => {
     const user = await db.Activity.findOne({
         where : { Id : id },
-        attributes:['Id','email','InviteStatus','RegStatus','IdVerification','KYCStatus','MembershipStatus']
     })
-
-    return user;
+    if(user) {
+        return {
+            inviteDetails : {
+                Status : user.InviteStatus,
+                InviteSentAt : user.InviteSentAt
+            },
+            regDetails : {
+                Status : user.RegStatus,
+                updatedAt : user.RegisteredAt
+            },
+            IdVerification : {
+                Status : user.IdVerification,
+            },
+            KYC : {
+                Status : user.KYCStatus,
+            },
+            Membership : {
+                Status : user.MembershipStatus,
+            },
+        };
+    }
 };
 
 exports.getAllInvites = async(page,size) => {
@@ -161,10 +201,56 @@ exports.getAllInvites = async(page,size) => {
     offset,
     include: [
         {model: db.Activity,
-        attributes:['InviteStatus','RegStatus','IdVerification','KYCStatus','MembershipStatus']
+        attributes:['InviteStatus','RegStatus','IdVerification','KYCStatus','MembershipStatus','LastLoginAt']
     }]
     })
 
     const response = getPagingData(invites,page,limit);
     return response;
+};
+
+exports.verifyId = async(id,admin) => {
+    const t = await sequelize.transaction();
+    try {
+        const user = await db.Activity.findOne({
+            where : {UserId : id},
+        },{ transaction: t })
+        if(user) {
+            const data = {
+                IdVerification : 'pass',
+                IdVerifiedAt : sequelize.literal('CURRENT_TIMESTAMP'),
+                IdVerifiedBy : admin
+            }
+    
+            await db.Activity.update(data,{ where : { UserId : id }},{ transaction: t })
+
+            return "ok";
+        };
+        await t.commit();
+    } catch(err) {
+        await t.rollback();
+        console.log(err);
+    }
+};
+
+exports.userHistory = async(id) => {
+    const user = await db.User.findOne({
+        where : {
+            UserId : id
+        }
+    });
+    
+    if(user) {
+       const events = await db.userActivity.findAll({
+        where : {
+            UserId : id,
+        },
+        attributes: ['user_activity_id','description','is_active','createdAt','createdBy','updatedAt','updatedBy','UserId']
+       });
+        return {
+            User_History : {
+                events
+            }
+        }
+    };
 };

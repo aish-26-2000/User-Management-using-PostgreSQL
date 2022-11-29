@@ -1,5 +1,6 @@
 const { BadRequestException } = require('../helpers/errorResponse');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const { CONSTANTS } = require('../config');
 
 

@@ -140,6 +140,25 @@ exports.resendInvite = async(req,res,next) => {
     }
 };
 
+
+exports.idVerification = async(req,res,next) => {
+    try{
+        const { userId,admin } = req.body;
+        const response = await adminService.verifyId(userId,admin)
+
+        if(response){
+            responseHelper.success(res,message= `User verified successfully by ${admin}`);
+        }
+
+        if(!response){
+            responseHelper.fail(res,'User not found');
+        }
+
+    } catch(err) {
+        next(responseHelper.fail(res,`${err}`));
+    }
+};
+
 exports.userList = async(req,res,next) => {
     try {
         const { page,size,sort_column,sort_order,query } = req.query;
@@ -154,8 +173,8 @@ exports.userList = async(req,res,next) => {
         };
 
     } catch(err) {
-        //next(responseHelper.fail(res,`${err}`));
-        next(err);
+        next(responseHelper.fail(res,`${err}`));
+        //next(err);
     }
 };
 
@@ -178,18 +197,18 @@ exports.userDetails = async(req,res,next) => {
     };
 };
 
-exports.userHistory = async(req,res,next) => {
+exports.getUserHistory = async(req,res,next) => {
     try{
-        const id = req.query.Id;
-        const details = await adminService.getUserHistory(id)
+        const id = req.query.id;
 
-        if(details){
-            responseHelper.success(res,details,'User Status.')
+        const response = await adminService.userHistory(id);
+        
+        if(!response) {
+            responseHelper.fail(res,'User not found')
         };
 
-        if(!details){
-            responseHelper.fail(res,'Error, User not found.')
-        };
+        responseHelper.success(res,response,'Success')
+
     } catch(err){
         next(responseHelper.fail(res,`${err}`));
     };
@@ -209,7 +228,7 @@ exports.invitesList = async(req,res,next) => {
         };
 
     } catch(err) {
-        //next(responseHelper.fail(res,`${err}`));
-        next(err);
+        next(responseHelper.fail(res,`${err}`));
     }
 };
+
