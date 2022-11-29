@@ -1,6 +1,5 @@
 const { sequelize } = require('../../database/models');
 const db = require('../../database/models');
-const Op = db.Sequelize.Op;
 const { bcrypt,jwt } = require('../../utils');
 const { MESSAGES, CONSTANTS } = require('../../config');
 const { BadRequestException,UnauthorizedException } = require('../../helpers/errorResponse');
@@ -28,8 +27,6 @@ exports.addPassword = async(email,password) => {
     if(user) {
         const cred = await db.user_cred.create({
             password : password,
-            createdBy : user.fullName,
-            updatedBy : user.fullName,
             UserId : user.UserId
         });
     
@@ -128,7 +125,8 @@ exports.updatePassword = async(email,oldPassword,newPassword) => {
   if(user) {
     const cred = await db.user_cred.findAll({
         where : { UserId : user.UserId},
-        order: [['createdAt','DESC']]
+        order: [['createdAt','DESC']],
+        limit: 3
        });
     
     const prev_pass = cred.map(ele => ele.password);

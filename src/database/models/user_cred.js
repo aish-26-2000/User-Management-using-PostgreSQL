@@ -21,17 +21,9 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.DATE,
                 allowNull : false                
             },
-            createdBy: {
-                type: DataTypes.STRING, 
-                allowNull: false               
-            },
             updatedAt: {
                 type: DataTypes.DATE,
                 allowNull : false    
-            },
-            updatedBy: {
-                type: DataTypes.STRING,
-                allowNull : false
             },
             password: {
                 type: DataTypes.STRING,

@@ -91,7 +91,12 @@ exports.login =  async(req,res,next) => {
             responseHelper.success(res,details);
         };
 
-        return responseHelper.success(res,response);
+        return responseHelper.success(res,{
+            id: response.id,
+            name: response.name,
+            email: response.email,
+            accessToken : response.accessToken,
+        });
 
     } catch(err) {
         next(responseHelper.fail(res,`${err}`));

@@ -65,7 +65,7 @@ exports.updateUserConsent = async(userid,agreementid) => {
 
     if(user) {
         await db.user_consent.update({
-            agreement_id : agreementid,
+            //agreement_id : agreementid,
             agreed : 'Y'
         },{
             where : {UserId : userid}

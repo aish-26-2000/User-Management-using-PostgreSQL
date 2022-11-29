@@ -5,6 +5,8 @@ const sendEmail = require('../../utils/email');
 const { responseHelper } = require('../../helpers');
 const { generateAccessToken } = require('../../utils/jwt');
 const moment = require('moment/moment');
+const { Op } = require('sequelize');
+const { Sequelize } = require('../../database/models');
 
 
 //get date 
@@ -147,18 +149,24 @@ exports.changePasswordReminders = async() => {
             <br>This is an auto-generated email.You are receiving this email because this is an important message regarding your account and products you are using.
         </body>
         </html>`;
-
+        /*
         const users = await db.User.findAll();
         let mailList = users.map(ele => {
             const t = ele.pass_changetime;
             const passChangeInterval =  moment(t).fromNow().slice(0,2);
-            if(passChangeInterval > 4 || passChangeInterval < 7 ) {
+            if(passChangeInterval > 4 && passChangeInterval < 7 ) {
+                return ele.email;
+            }
+        });*/
+        const users = await db.User.findAll();
+        const mailList = users.map(ele => {
+            if(ele.passChangeInterval > 4 && ele.passChangeInterval < 7) {
                 return ele.email;
             }
         });
         mailList.forEach(email => {
             //scheduled at 9.30 everyday
-            cron.schedule('30 9 * * *',async() => {
+            cron.schedule('30 09 * * *',async() => {
                 await sendEmail({
                     from :'no-reply@standardc.com' ,
                     to : email,

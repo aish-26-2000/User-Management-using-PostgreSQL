@@ -1,7 +1,6 @@
-const { set } = require('date-fns');
-const { get } = require('http');
 const { Model } = require('sequelize');
 const db = require('.');
+const { calculateDateInterval } = require('../../modules/user/user.service');
 const { getAccessURL } = require('../../utils/s3helper');
 
 module.exports = (sequelize, DataTypes) => {
@@ -71,6 +70,15 @@ module.exports = (sequelize, DataTypes) => {
             pass_changetime : {
                 type: DataTypes.DATE,
                 allowNull : true
+            },
+            passChangeInterval : {
+                type : DataTypes.VIRTUAL,
+                get() {
+                    const date = this.getDataValue('pass_changetime')
+                    const oneday = 1000*60*60*24;
+                    const diff = new Date() - new Date(date)
+                    return (Math.floor(diff/oneday));
+                }
             }
         },
         {
