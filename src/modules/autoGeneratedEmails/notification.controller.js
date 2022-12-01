@@ -143,21 +143,17 @@ exports.changePasswordReminders = async() => {
         </head>
         <body>
             <p>Hi, Greetings from StandardC! </p>
-            <p>Your password will be expiring soon. 
-            <br>Login to your StandardC account and update now. Note this as a reminder to change your password to prevent expiration.
-            
+            <p>Your password will be expiring soon.
+            <br>Login to your StandardC account and update now. Note this as a reminder to change your password to prevent expiration.</p>
             <br>This is an auto-generated email.You are receiving this email because this is an important message regarding your account and products you are using.
         </body>
         </html>`;
-        /*
-        const users = await db.User.findAll();
-        let mailList = users.map(ele => {
-            const t = ele.pass_changetime;
-            const passChangeInterval =  moment(t).fromNow().slice(0,2);
-            if(passChangeInterval > 4 && passChangeInterval < 7 ) {
-                return ele.email;
-            }
-        });*/
+        
+        /*const users = await db.User.findAll({ 
+            where: sequelize.where(Sequelize.fn('datediff', Sequelize.fn("NOW") , Sequelize.col('pass_changetime')), {
+                [Op.gt] : 4
+            })
+        })*/
         const users = await db.User.findAll();
         const mailList = users.map(ele => {
             if(ele.passChangeInterval > 4 && ele.passChangeInterval < 7) {
