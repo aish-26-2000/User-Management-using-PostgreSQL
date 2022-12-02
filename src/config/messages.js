@@ -1,6 +1,7 @@
 module.exports = {
     USER: {
         LOGIN: {
+            MAX_ATTEMPTS : 'Too Many Attempts try affter some time',
             INVALID_CREDS: 'Invalid login credentials',
             AGREEMENTS : 'Accept the Terms and Conditions',
             CHANGE_PASSWORD :'Your Password will be expiring soon. Update your password to prevent expiration',

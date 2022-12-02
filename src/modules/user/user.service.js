@@ -1,10 +1,12 @@
 const { sequelize } = require('../../database/models');
 const db = require('../../database/models');
 const { bcrypt,jwt } = require('../../utils');
-const { MESSAGES, CONSTANTS } = require('../../config');
-const { BadRequestException,UnauthorizedException } = require('../../helpers/errorResponse');
+const { MESSAGES } = require('../../config');
+const { BadRequestException,UnauthorizedException, MaxRequestsException } = require('../../helpers/errorResponse');
 const { createEmailInviteEvent, createRegEvent, createAccEvent } = require('../history/history.service');
 const moment = require('moment/moment');
+const client = require('../../utils/redis');
+
 
 exports.findUser = async(e) => {
     const user = await db.Invite.findOne({where : {email : e}})
@@ -75,14 +77,25 @@ exports.getResponse = async(e) => {
     };
 };
 
-exports.login = async (email,password) => {
+exports.login = async(email,password) => {
+    const maxNumberOfFailedLogins = 3;
+    const timeWindowForFailedLogins = 60 * 60 * 1;
 
-    const user = await db.User.findOne({ where: { email } });
-    if (!user) throw new BadRequestException(MESSAGES.USER.LOGIN.INVALID_CREDS);
+    let userAttempts = await client.get('userAttempt')
+    if(userAttempts > maxNumberOfFailedLogins) throw new MaxRequestsException(MESSAGES.USER.LOGIN.MAX_ATTEMPTS);
+
+    const user = await db.User.findOne({ where: { email : email } });
+    if (!user) {
+        client.set('userAttempt',++userAttempts,'ex',timeWindowForFailedLogins);
+        throw new BadRequestException(MESSAGES.USER.LOGIN.INVALID_CREDS);
+    };
 
     const passChangeInterval =  moment(user.pass_changetime).fromNow().slice(0,2); //this.calculateDateInterval(user.pass_changetime);
 
-    if(passChangeInterval > 7) return 'password expired';
+    if(passChangeInterval > 7) {
+        client.set('userAttempt',++userAttempts,'ex',timeWindowForFailedLogins);
+        return 'password expired';
+    };
 
     const cred = await db.user_cred.findAll({
          where : { UserId : user.UserId},
@@ -91,7 +104,12 @@ exports.login = async (email,password) => {
     let prev_pass = cred.map(pass => pass.password);
 
     const passwordMatch = await bcrypt.verifyPassword(password, prev_pass[0]);
-    if (!passwordMatch) throw new BadRequestException(MESSAGES.USER.LOGIN.INVALID_CREDS);
+    if (!passwordMatch) {
+        client.set('userAttempt',++userAttempts,'ex',timeWindowForFailedLogins);
+        throw new BadRequestException(MESSAGES.USER.LOGIN.INVALID_CREDS);
+    };
+
+    client.del('userAttempt');
 
     const checkAgreements = await user.agreements
     if(checkAgreements === false) throw new BadRequestException(MESSAGES.USER.LOGIN.AGREEMENTS);

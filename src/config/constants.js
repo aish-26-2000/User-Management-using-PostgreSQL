@@ -33,6 +33,12 @@ module.exports = {
 
     },
 
+    REDIS : {
+        REDIS_USER : process.env.REDIS_USER,
+        REDIS_PASSWORD : process.env.REDIS_PASSWORD,
+        REDIS_END_POINT : process.env.REDIS_END_POINT,
+    },
+
     USER: {
         ROLES: {
             USER: 'USER',

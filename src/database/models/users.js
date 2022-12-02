@@ -1,6 +1,4 @@
 const { Model } = require('sequelize');
-const db = require('.');
-const { calculateDateInterval } = require('../../modules/user/user.service');
 const { getAccessURL } = require('../../utils/s3helper');
 
 module.exports = (sequelize, DataTypes) => {

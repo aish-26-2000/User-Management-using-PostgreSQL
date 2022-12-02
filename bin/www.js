@@ -78,7 +78,7 @@
      const bind = typeof addr === 'string' ? `pipe ${addr}` : `port ${addr.port}`;
      logger.info(`Server listening at ${bind} in ${CONSTANTS.APP.env} mode`);
  }
- 
+
  /**
   * Listen on provided port, on all network interfaces.
   */
