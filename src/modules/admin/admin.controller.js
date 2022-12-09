@@ -140,7 +140,7 @@ exports.idVerification = async (req, res, next) => {
         const response = await adminService.verifyId(userId, admin);
 
         if (response) {
-            responseHelper.success(res, (message = `User verified successfully by ${admin}`));
+            responseHelper.success(res, `User verified successfully by ${admin}`);
         }
 
         if (!response) {

@@ -1,5 +1,5 @@
 require('dotenv').config();
-var express = require('express');
+const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 var path = require('path');
