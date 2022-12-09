@@ -161,7 +161,6 @@ exports.addBusiness = async (data) => {
     const response = await db.Business.create(data);
 
     if (response) {
-        console.log();
         await db.Business_Stage_Status.create({
             createdBy: data.createdBy,
             updatedBy: data.updatedBy,

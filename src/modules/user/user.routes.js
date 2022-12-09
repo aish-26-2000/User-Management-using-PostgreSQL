@@ -18,7 +18,7 @@ router.use(
     '/register/:token',
     upload({
         limits: { fileSize: 1024 * 1024 },
-        limitHandler: function (req, res, next) {
+        limitHandler: function (req, res) {
             responseHelper.fail(res, 'File size limit has been exceeded');
         },
     }),

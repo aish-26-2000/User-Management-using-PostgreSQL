@@ -36,7 +36,7 @@ exports.addNewBusiness = async (req, res, next) => {
         }
 
         responseHelper.success(res, response, 'Business added successfully.');
-    } catch {
+    } catch (err) {
         next(err);
     }
 };
