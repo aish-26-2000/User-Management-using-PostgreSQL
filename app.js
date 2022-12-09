@@ -1,8 +1,7 @@
 require('dotenv').config();
-const express = require('express');
+var express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
-const toobusy = require('toobusy-js');
 var path = require('path');
 var fs = require('fs');
 const { logger } = require('./src/utils');
@@ -33,16 +32,6 @@ app.use(
         max: 100, // Limit each IP to 100 requests per `window`
     })
 );
-
-/**
- * //monitor event loop
-app.use(function(req,res){
-    if(toobusy()){
-        logger.warn('503 Server too busy.');
-        return res.statusCode(503);
-    };
-});
- */
 
 // log only 4xx and 5xx responses to console
 app.use(
