@@ -12,14 +12,14 @@
     "rules": {
         "linebreak-style": ["error", "windows"],
         "semi": ["error", "always"],
-        "spaced-comment": ["error","always"],
-        //possible problems
+        "spaced-comment": "error",
+        // possible problems
         "no-const-assign": "error",
         "no-undefined": "error",
         "no-unused-vars": "error",
         "no-duplicate-imports": "error",
         "no-use-before-define": "error",
-        //suggestions
+        // suggestions
         "no-var": "error"
     }
 }
