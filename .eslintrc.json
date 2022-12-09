@@ -15,6 +15,8 @@
         "no-const-assign": "error",
         "no-undefined": "error",
         "no-unused-vars": "error",
-        "no-duplicate-imports":"error"
+        "no-duplicate-imports":"error",
+        "no-use-before-define":"error",
+        "no-var":"error"
     }
 }
