@@ -12,7 +12,17 @@
     "rules": {
         "linebreak-style": ["error", "windows"],
         "semi": ["error", "always"],
-        "spaced-comment": "error",
+        "spaced-comment": ["error", "always", {
+            "line": {
+                "markers": ["/"],
+                "exceptions": ["-", "+"]
+            },
+            "block": {
+                "markers": ["!"],
+                "exceptions": ["*"],
+                "balanced": true
+            }
+        }],
         // possible problems
         "no-const-assign": "error",
         "no-undefined": "error",
