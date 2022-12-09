@@ -8,7 +8,8 @@
     },
     "scripts": {
         "test": "node ./bin/www",
-        "start": "nodemon ./bin/www"
+        "start": "nodemon ./bin/www",
+        "prepare": "husky install"
     },
     "husky": {
         "hooks": {
