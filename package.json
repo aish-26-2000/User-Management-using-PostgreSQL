@@ -11,17 +11,6 @@
         "start": "nodemon ./bin/www",
         "prepare": "husky install"
     },
-    "husky": {
-        "hooks": {
-            "pre-commit": "lint-staged"
-        }
-    },
-    "lint-staged": {
-        "*.{js,jsx}": [
-            "prettier --write",
-            "eslint --fix"
-        ]
-    },
     "keywords": [
         "node",
         "express",
@@ -64,5 +53,9 @@
         "husky": "^8.0.2",
         "lint-staged": "^13.1.0",
         "prettier": "^2.7.1"
+    },
+    "lint-staged": {
+        "*.js": "eslint --cache --fix",
+        "*.{js,css,md}": "prettier --write"
     }
 }
