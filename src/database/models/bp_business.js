@@ -4,10 +4,10 @@ module.exports = (sequelize, DataTypes) => {
     class Business extends Model {
         // Helper method for defining associations.
         // This method is not a part of Sequelize lifecycle.
-        // The `models/index` file will call this method automatically. 
+        // The `models/index` file will call this method automatically.
         static associate(model) {
-            Business.hasMany(model.Business_Stage_Status,{ foreignKey:'bp_business_id' });
-        }    
+            Business.hasMany(model.Business_Stage_Status, { foreignKey: 'bp_business_id' });
+        }
     }
     Business.init(
         {
@@ -18,22 +18,22 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.BIGINT,
             },
             bp_group_shortcode: {
-                type: DataTypes.ENUM('MEMBZ','MEMFI'),
-                allowNull : false
+                type: DataTypes.ENUM('MEMBZ', 'MEMFI'),
+                allowNull: false,
             },
             is_active: {
-                type: DataTypes.ENUM('Y','N'),
-                defaultValue : 'Y'
+                type: DataTypes.ENUM('Y', 'N'),
+                defaultValue: 'Y',
             },
             createdAt: {
-                type: DataTypes.DATE,                
+                type: DataTypes.DATE,
             },
             createdBy: {
-                type: DataTypes.STRING, 
-                allowNull: false               
+                type: DataTypes.STRING,
+                allowNull: false,
             },
             updatedAt: {
-                type: DataTypes.DATE,                
+                type: DataTypes.DATE,
             },
             updatedBy: {
                 type: DataTypes.STRING,
@@ -47,22 +47,21 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
             },
             is_approved: {
-                type: DataTypes.ENUM('Y','N'),
-                defaultValue : 'N'
+                type: DataTypes.ENUM('Y', 'N'),
+                defaultValue: 'N',
             },
             is_approved_vendor: {
-                type: DataTypes.ENUM('Y','N'),
-                defaultValue : 'N'
+                type: DataTypes.ENUM('Y', 'N'),
+                defaultValue: 'N',
             },
             is_cannabis_business: {
-                type: DataTypes.ENUM('Y','N'),
-                defaultValue : 'Y'
+                type: DataTypes.ENUM('Y', 'N'),
+                defaultValue: 'Y',
             },
             is_createdby_stdc: {
-                type: DataTypes.ENUM('Y','N'),
-                defaultValue : 'N'
+                type: DataTypes.ENUM('Y', 'N'),
+                defaultValue: 'N',
             },
-           
         },
         {
             sequelize,

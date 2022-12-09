@@ -4,10 +4,10 @@ module.exports = (sequelize, DataTypes) => {
     class user_cred extends Model {
         // Helper method for defining associations.
         // This method is not a part of Sequelize lifecycle.
-        // The `models/index` file will call this method automatically. 
+        // The `models/index` file will call this method automatically.
         static associate(model) {
             user_cred.belongsTo(model.User, { foreignKey: 'UserId' });
-        }      
+        }
     }
     user_cred.init(
         {
@@ -19,20 +19,19 @@ module.exports = (sequelize, DataTypes) => {
             },
             createdAt: {
                 type: DataTypes.DATE,
-                allowNull : false                
+                allowNull: false,
             },
             updatedAt: {
                 type: DataTypes.DATE,
-                allowNull : false    
+                allowNull: false,
             },
             password: {
                 type: DataTypes.STRING,
-                allowNull: true
+                allowNull: true,
             },
-            UserId : {
+            UserId: {
                 type: DataTypes.BIGINT,
             },
-           
         },
         {
             sequelize,

@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
+const toobusy = require('toobusy-js');
 var path = require('path');
 var fs = require('fs');
 const { logger } = require('./src/utils');
@@ -14,6 +16,7 @@ const app = express();
 autoReport();
 changePasswordReminders();
 
+//setting up request size limit
 app.use(
     express.urlencoded({
         limit: '50mb',
@@ -23,21 +26,43 @@ app.use(
 );
 app.use(express.json({ limit: '50mb' }));
 
-// log only 4xx and 5xx responses to console
-app.use(morgan('dev', {
-    skip: function (req, res) { return res.statusCode < 400 }
-  }))
-   
-// log all requests to access.log
-app.use(morgan('common', {
-stream: fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
-}))
+// Each IP can only send limited requests in 10 minutes
+app.use(
+    rateLimit({
+        windowsMS: 1000 * 60 * 15, // 15 minutes
+        max: 100, // Limit each IP to 100 requests per `window`
+    })
+);
 
+/**
+ * //monitor event loop
+app.use(function(req,res){
+    if(toobusy()){
+        logger.warn('503 Server too busy.');
+        return res.statusCode(503);
+    };
+});
+ */
+
+// log only 4xx and 5xx responses to console
+app.use(
+    morgan('dev', {
+        skip: function (req, res) {
+            return res.statusCode < 400;
+        },
+    })
+);
+
+// log all requests to access.log
+app.use(
+    morgan('common', {
+        stream: fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' }),
+    })
+);
 
 app.use('/api/v1', routes);
 
 app.use(errorHandler);
-
 
 process.on('uncaughtException', function (err) {
     logger.error(err);
@@ -49,4 +74,3 @@ process.on('unhandledRejection', function (reason, p) {
 });
 
 module.exports = app;
-  

@@ -9,9 +9,9 @@ const router = express.Router();
 router.use(basicAuth);
 
 //get
-router.get('/getAllBusinessList',validationMiddleware(businessSchema.allBusinessList),getAllBusinessList);
+router.get('/getAllBusinessList', validationMiddleware(businessSchema.allBusinessList), getAllBusinessList);
 
 //add
-router.post('/addBusiness',validationMiddleware(businessSchema.newBusiness),addNewBusiness);
+router.post('/addBusiness', validationMiddleware(businessSchema.newBusiness), addNewBusiness);
 
 module.exports = router;

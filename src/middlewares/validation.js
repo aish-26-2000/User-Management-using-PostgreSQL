@@ -25,6 +25,6 @@ module.exports = (schema) => (req, res, next) => {
         next();
     } catch (error) {
         //throw new UnHandledException(error);
-        next(responseHelper.fail(res,`${error}`));
+        next(responseHelper.fail(res, `${error}`));
     }
 };

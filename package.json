@@ -1,52 +1,69 @@
 {
-  "name": "user-management-using-postgresql",
-  "version": "1.0.0",
-  "description": "User management module using postgresql",
-  "main": "app.js",
-  "bin": {
-    "user-management-using-postgresql": "bin/www.js"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon ./bin/www"
-  },
-  "keywords": [
-    "node",
-    "express",
-    "sequelize",
-    "postgresql"
-  ],
-  "author": "Aish",
-  "license": "ISC",
-  "dependencies": {
-    "aws-sdk": "^2.1250.0",
-    "bcrypt": "^5.1.0",
-    "cli": "^1.0.1",
-    "date-fns": "^2.29.3",
-    "dotenv": "^16.0.3",
-    "express": "^4.18.2",
-    "express-fileupload": "^1.4.0",
-    "express-rate-limit": "^6.7.0",
-    "joi": "^17.7.0",
-    "jsonwebtoken": "^8.5.1",
-    "moment": "^2.29.4",
-    "morgan": "^1.10.0",
-    "multer": "^1.4.5-lts.1",
-    "node": "^19.0.1",
-    "node-cron": "^3.0.2",
-    "nodemailer": "^6.8.0",
-    "nodemon": "^2.0.20",
-    "owasp-password-strength-test": "^1.3.0",
-    "pg": "^8.8.0",
-    "pg-hstore": "^2.3.4",
-    "redis": "^4.5.1",
-    "sequelize": "^6.25.6",
-    "winston": "^3.8.2",
-    "winston-daily-rotate-file": "^4.7.1"
-  },
-  "devDependencies": {
-    "eslint": "^8.27.0",
-    "eslint-config-prettier": "^8.5.0",
-    "prettier": "^2.7.1"
-  }
+    "name": "user-management-using-postgresql",
+    "version": "1.0.0",
+    "description": "User management module using postgresql",
+    "main": "app.js",
+    "bin": {
+        "user-management-using-postgresql": "bin/www.js"
+    },
+    "scripts": {
+        "test": "node ./bin/www",
+        "start": "nodemon ./bin/www",
+        "prepare": "husky install"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
+    },
+    "lint-staged": {
+        "*.{js,jsx}": [
+            "prettier --write",
+            "eslint --fix",
+            "git add"
+        ]
+    },
+    "keywords": [
+        "node",
+        "express",
+        "sequelize",
+        "postgresql"
+    ],
+    "author": "Aish",
+    "license": "ISC",
+    "dependencies": {
+        "aws-sdk": "^2.1250.0",
+        "bcrypt": "^5.1.0",
+        "cli": "^1.0.1",
+        "date-fns": "^2.29.3",
+        "dotenv": "^16.0.3",
+        "express": "^4.18.2",
+        "express-fileupload": "^1.4.0",
+        "express-rate-limit": "^6.7.0",
+        "joi": "^17.7.0",
+        "jsonwebtoken": "^8.5.1",
+        "moment": "^2.29.4",
+        "morgan": "^1.10.0",
+        "multer": "^1.4.5-lts.1",
+        "node": "^19.0.1",
+        "node-cron": "^3.0.2",
+        "nodemailer": "^6.8.0",
+        "nodemon": "^2.0.20",
+        "owasp-password-strength-test": "^1.3.0",
+        "pg": "^8.8.0",
+        "pg-hstore": "^2.3.4",
+        "redis": "^4.5.1",
+        "sequelize": "^6.25.6",
+        "svg-captcha": "^1.4.0",
+        "toobusy-js": "^0.5.1",
+        "winston": "^3.8.2",
+        "winston-daily-rotate-file": "^4.7.1"
+    },
+    "devDependencies": {
+        "eslint": "^8.27.0",
+        "eslint-config-prettier": "^8.5.0",
+        "husky": "^8.0.2",
+        "lint-staged": "^13.1.0",
+        "prettier": "^2.7.1"
+    }
 }

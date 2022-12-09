@@ -9,4 +9,3 @@ class MaxRequestsException extends Error {
 }
 
 module.exports = MaxRequestsException;
- 

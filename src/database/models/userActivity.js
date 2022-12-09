@@ -25,24 +25,24 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
             },
             is_active: {
-                type: DataTypes.ENUM('Y','N'),
-                allowNull : false
+                type: DataTypes.ENUM('Y', 'N'),
+                allowNull: false,
             },
             createdAt: {
-                type: DataTypes.DATE,                
+                type: DataTypes.DATE,
             },
             createdBy: {
-                type: DataTypes.STRING,                
+                type: DataTypes.STRING,
             },
             updatedAt: {
-                type: DataTypes.DATE,                
+                type: DataTypes.DATE,
             },
             updatedBy: {
-                type: DataTypes.STRING,                
+                type: DataTypes.STRING,
             },
             UserId: {
                 type: DataTypes.BIGINT,
-            }
+            },
         },
         {
             sequelize,

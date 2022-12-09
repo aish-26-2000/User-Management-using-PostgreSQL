@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
         // This method is not a part of Sequelize lifecycle.
         // The `models/index` file will call this method automatically.
         static associate(model) {
-            Invite.hasMany(model.Activity,{ foreignKey: 'InviteId' });
+            Invite.hasMany(model.Activity, { foreignKey: 'InviteId' });
         }
     }
     Invite.init(
@@ -22,13 +22,13 @@ module.exports = (sequelize, DataTypes) => {
                 unique: true,
             },
             RegStatus: {
-                type: DataTypes.ENUM('pending','completed'),
-                defaultValue : 'pending'
+                type: DataTypes.ENUM('pending', 'completed'),
+                defaultValue: 'pending',
             },
             active: {
-                type : DataTypes.BOOLEAN,
-                defaultValue : true
-            }
+                type: DataTypes.BOOLEAN,
+                defaultValue: true,
+            },
         },
         {
             sequelize,

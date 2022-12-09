@@ -4,10 +4,10 @@ module.exports = (sequelize, DataTypes) => {
     class Business_Stage_Status extends Model {
         // Helper method for defining associations.
         // This method is not a part of Sequelize lifecycle.
-        // The `models/index` file will call this method automatically.  
+        // The `models/index` file will call this method automatically.
         static associate(model) {
             Business_Stage_Status.belongsTo(model.Business, { foreignKey: 'bp_business_id' });
-        }     
+        }
     }
     Business_Stage_Status.init(
         {
@@ -18,34 +18,34 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.BIGINT,
             },
             is_active: {
-                type: DataTypes.ENUM('Y','N'),
-                defaultValue : 'Y'
+                type: DataTypes.ENUM('Y', 'N'),
+                defaultValue: 'Y',
             },
             createdAt: {
-                type: DataTypes.DATE,                
+                type: DataTypes.DATE,
             },
             createdBy: {
-                type: DataTypes.STRING, 
-                allowNull: false               
+                type: DataTypes.STRING,
+                allowNull: false,
             },
             updatedAt: {
-                type: DataTypes.DATE,                
+                type: DataTypes.DATE,
             },
             updatedBy: {
                 type: DataTypes.STRING,
             },
             stage: {
-                type: DataTypes.ENUM('Membership','StandardC Due Diligence','Business KYC/CDD','Business Profile'),
+                type: DataTypes.ENUM('Membership', 'StandardC Due Diligence', 'Business KYC/CDD', 'Business Profile'),
                 allowNull: false,
             },
             status: {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
-            bp_business_id : {
+            bp_business_id: {
                 type: DataTypes.BIGINT,
-                allowNull: false
-            }
+                allowNull: false,
+            },
         },
         {
             sequelize,

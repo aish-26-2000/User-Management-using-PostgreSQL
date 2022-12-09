@@ -1,8 +1,6 @@
 const { BadRequestException } = require('../helpers/errorResponse');
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
 const { CONSTANTS } = require('../config');
-
 
 exports.verifyToken = (token) => {
     // eslint-disable-next-line no-unused-vars
@@ -15,8 +13,8 @@ exports.verifyToken = (token) => {
 };
 
 exports.generateAccessToken = (email) => {
-    return jwt.sign({email}, CONSTANTS.JWT.JWT_SECRET,{
-        expiresIn :  CONSTANTS.JWT.JWT_EXPIRES_IN
+    return jwt.sign({ email }, CONSTANTS.JWT.JWT_SECRET, {
+        expiresIn: CONSTANTS.JWT.JWT_EXPIRES_IN,
     });
 };
 

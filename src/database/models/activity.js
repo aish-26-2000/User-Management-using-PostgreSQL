@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
         // The `models/index` file will call this method automatically.
         static associate(model) {
             Activity.belongsTo(model.User, { foreignKey: 'UserId' });
-            Activity.belongsTo(model.Invite, { foreignKey : 'InviteId' });
+            Activity.belongsTo(model.Invite, { foreignKey: 'InviteId' });
         }
     }
     Activity.init(
@@ -23,35 +23,35 @@ module.exports = (sequelize, DataTypes) => {
                 unique: true,
             },
             InviteStatus: {
-                type: DataTypes.ENUM('sent','fail'),
+                type: DataTypes.ENUM('sent', 'fail'),
             },
             InviteSentAt: {
                 type: DataTypes.DATE,
             },
             RegStatus: {
-                type: DataTypes.ENUM('pending','complete'),
-                defaultValue : 'pending'
+                type: DataTypes.ENUM('pending', 'complete'),
+                defaultValue: 'pending',
             },
             RegisteredAt: {
-                type: DataTypes.DATE,                
+                type: DataTypes.DATE,
             },
             IdVerification: {
-                type: DataTypes.ENUM('pending','pass'),
-                defaultValue : 'pending'
+                type: DataTypes.ENUM('pending', 'pass'),
+                defaultValue: 'pending',
             },
             IdVerifiedAt: {
-                type: DataTypes.DATE,                
+                type: DataTypes.DATE,
             },
             IdVerifiedBy: {
-                type: DataTypes.STRING,                
+                type: DataTypes.STRING,
             },
-            KYCStatus : {
-                type: DataTypes.ENUM('pending','complete'),
-                defaultValue : 'pending'
+            KYCStatus: {
+                type: DataTypes.ENUM('pending', 'complete'),
+                defaultValue: 'pending',
             },
             MembershipStatus: {
-                type: DataTypes.ENUM('active','inactive'),
-                defaultValue : 'inactive'
+                type: DataTypes.ENUM('active', 'inactive'),
+                defaultValue: 'inactive',
             },
             UserId: {
                 type: DataTypes.BIGINT,
@@ -60,7 +60,7 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.BIGINT,
             },
             LastLoginAt: {
-                type: DataTypes.DATE,                
+                type: DataTypes.DATE,
             },
         },
         {
