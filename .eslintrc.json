@@ -12,7 +12,8 @@
     "rules": {
         "linebreak-style": ["error", "windows"],
         "semi": ["error", "always"],
-        "no-console": "error",
+        "no-const-assign": "error",
+        "no-undefined": "error",
         "no-unused-vars": "error"
     }
 }
