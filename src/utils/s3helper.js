@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk');
 const { CONSTANTS } = require('../config');
 
-//initialize S3 instance
+// initialize S3 instance
 const s3Config = {
     apiVersion: '2006-03-01',
     accessKeyId: CONSTANTS.S3.S3_ACCESS_KEY_ID,
@@ -11,10 +11,10 @@ const s3Config = {
 
 const s3 = new AWS.S3(s3Config);
 
-//upload file
+// upload file
 exports.upload = async (file, key) => {
     try {
-        //setting s3 parameters
+        // setting s3 parameters
         const params = {
             Bucket: CONSTANTS.S3.S3_BUCKET,
             Key: key,
@@ -22,7 +22,7 @@ exports.upload = async (file, key) => {
             ContentType: 'image/jpeg',
         };
 
-        //uploading files to bucket
+        // uploading files to bucket
         const data = await s3.upload(params).promise();
         return data.Location;
     } catch (err) {
@@ -30,14 +30,14 @@ exports.upload = async (file, key) => {
     }
 };
 
-//access the private object
+// access the private object
 exports.getAccessURL = async (key) => {
     try {
         const params = {
             Bucket: CONSTANTS.S3.S3_BUCKET,
             Key: key,
         };
-        //check if obj exists in the bucket
+        // check if obj exists in the bucket
         await s3.headObject(params).promise();
         const url = await s3.getSignedUrlPromise('getObject', {
             Bucket: CONSTANTS.S3.S3_BUCKET,
@@ -54,7 +54,7 @@ exports.getAccessURL = async (key) => {
     }
 };
 
-//delete the image
+// delete the image
 exports.delete = (key) => {
     s3.deleteObject({
         Bucket: CONSTANTS.S3.S3_BUCKET,

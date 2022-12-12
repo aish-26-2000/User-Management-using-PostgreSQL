@@ -27,11 +27,11 @@ exports.basicAuth = async (req, res, next) => {
 exports.sendInvite = async (req, res, next) => {
     const email = req.body.email;
     try {
-        //generate accesstoken and URL
+        // generate accesstoken and URL
         const accessToken = jwt.generateAccessToken(email);
         const registerURL = `${req.protocol}://${req.get('host')}/api/v1/user/register/${accessToken}`;
 
-        //compose email
+        // compose email
         const message = `Submit a POST request with all your details to:\n${registerURL}`;
         const html = `<!doctype html>
         <html ⚡4email>
@@ -47,7 +47,7 @@ exports.sendInvite = async (req, res, next) => {
         </body>
         </html>`;
 
-        //send invitation email
+        // send invitation email
         await sendmail({
             from: 'ADMIN <admin@standardc.com>',
             to: email,
@@ -56,10 +56,10 @@ exports.sendInvite = async (req, res, next) => {
             message,
         });
 
-        //add invite to db
+        // add invite to db
         await adminService.addInvite(email);
 
-        //response
+        // response
         responseHelper.success(res, `Invite sent successfully to user [${email}]`);
     } catch (err) {
         next(err);
@@ -95,11 +95,11 @@ exports.resendInvite = async (req, res, next) => {
         const email = req.body.email;
         await adminService.removeUser(email);
 
-        //generate accesstoken and URL
+        // accesstoken and URL
         const accessToken = jwt.generateAccessToken(email);
         const registerURL = `${req.protocol}://${req.get('host')}/api/v1/user/register/${accessToken}`;
 
-        //compose email
+        // compose email
         const message = `Submit a POST request with all your details to:\n${registerURL}`;
         const html = `<!doctype html>
         <html ⚡4email>
@@ -115,7 +115,7 @@ exports.resendInvite = async (req, res, next) => {
         </body>
         </html>`;
 
-        //send invitation email
+        // send invitation email
         await sendmail({
             from: 'ADMIN <admin@standardc.com>',
             to: email,
@@ -124,10 +124,10 @@ exports.resendInvite = async (req, res, next) => {
             message,
         });
 
-        //add invite to db
+        // add invite to db
         await adminService.addInvite(email);
 
-        //response
+        // response
         responseHelper.success(res, `Invite resent successfully to user ${email}`);
     } catch (err) {
         next(err);

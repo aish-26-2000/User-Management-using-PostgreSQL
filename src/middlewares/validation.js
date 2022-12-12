@@ -1,5 +1,5 @@
 const { responseHelper } = require('../helpers');
-const { UnHandledException, PreconditionException } = require('../helpers/errorResponse');
+const { PreconditionException } = require('../helpers/errorResponse');
 
 const options = {
     basic: {
@@ -24,7 +24,7 @@ module.exports = (schema) => (req, res, next) => {
 
         next();
     } catch (error) {
-        //throw new UnHandledException(error);
+        // throw new UnHandledException(error);
         next(responseHelper.fail(res, `${error}`));
     }
 };

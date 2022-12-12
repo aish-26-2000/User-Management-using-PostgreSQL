@@ -12,10 +12,10 @@ exports.Register = async (req, res, next) => {
     try {
         const token = req.params.token;
         const email = jwt.parseToken(token);
-        //verify token
+        // verify token
         await jwt.verifyToken(token);
 
-        //find user
+        // find user
         const user = await userService.findUser(email);
 
         if (!user) {
@@ -23,11 +23,11 @@ exports.Register = async (req, res, next) => {
         }
 
         if (user) {
-            //user reg pending
-            //hash password
+            // user reg pending
+            // hash password
             req.body.password = await bcrypt.hashPassword(req.body.password);
 
-            //user details
+            // user details
             const data = {
                 firstName: req.body.firstName,
                 lastName: req.body.lastName,
@@ -37,9 +37,9 @@ exports.Register = async (req, res, next) => {
 
             await userService.addUser(email, data);
 
-            //upload profile image
+            // upload profile image
             if (req.files) {
-                //check img params
+                // check img params
                 const img = req.files.image;
                 const key = email.substring(0, email.lastIndexOf('@'));
 
@@ -53,7 +53,7 @@ exports.Register = async (req, res, next) => {
 
             await createUserConsent(email);
 
-            //get response
+            // get response
             const userData = await userService.getResponse(email);
             responseHelper.success(res, userData, 'User registered successfully');
         }
@@ -109,7 +109,7 @@ exports.forgotPassword = async (req, res, next) => {
 
         const resetURL = `${req.protocol}://${req.get('host')}/api/v1/user/resetpassword/${resetToken}`;
 
-        //compose email
+        // compose email
         const message = `Submit a PATCH request with the details to:\n${resetURL}`;
         const html = `<!doctype html>
         <html ⚡4email>
@@ -125,7 +125,7 @@ exports.forgotPassword = async (req, res, next) => {
         </body>
         </html>`;
 
-        //send invitation email
+        // send invitation email
         await sendEmail({
             from: 'ADMIN <admin@standardc.com>',
             to: email,
@@ -154,7 +154,7 @@ exports.resetPassword = async (req, res, next) => {
             responseHelper.fail(res, 'Enter new pssword. New password should be different from previous passwords.');
         }
 
-        //compose email
+        // compose email
         const message = `Password reset successfully. You can login now.`;
         const html = `<!doctype html>
         <html ⚡4email>
@@ -168,7 +168,7 @@ exports.resetPassword = async (req, res, next) => {
         </body>
         </html>`;
 
-        //send invitation email
+        // send invitation email
         await sendEmail({
             from: 'ADMIN <admin@standardc.com>',
             to: email,
@@ -196,7 +196,7 @@ exports.changePassword = async (req, res, next) => {
             responseHelper.fail(res, 'Enter new password. New password should be different from previous passwords.');
         }
 
-        //compose email
+        // compose email
         const message = `Password changed successfully.`;
         const html = `<!doctype html>
         <html ⚡4email>
@@ -210,7 +210,7 @@ exports.changePassword = async (req, res, next) => {
         </body>
         </html>`;
 
-        //send invitation email
+        // send invitation email
         await sendEmail({
             from: 'ADMIN <admin@standardc.com>',
             to: email,

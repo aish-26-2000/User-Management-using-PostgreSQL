@@ -1,7 +1,6 @@
-const { sequelize, Sequelize } = require('../../database/models');
+const { sequelize } = require('../../database/models');
 const db = require('../../database/models');
 const Op = db.Sequelize.Op;
-const { getAccessURL } = require('../../utils/s3helper');
 
 exports.addInvite = async (data) => {
     const response = await db.Invite.create({ email: data });

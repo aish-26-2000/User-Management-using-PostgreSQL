@@ -8,10 +8,10 @@ const router = express.Router();
 
 router.use(basicAuth);
 
-//get
+// get
 router.get('/getAllBusinessList', validationMiddleware(businessSchema.allBusinessList), getAllBusinessList);
 
-//add
+// add
 router.post('/addBusiness', validationMiddleware(businessSchema.newBusiness), addNewBusiness);
 
 module.exports = router;
