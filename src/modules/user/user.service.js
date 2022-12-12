@@ -93,7 +93,7 @@ exports.login = async (email, password) => {
 
     if (userAttempts > maxNumberOfFailedLogins) throw new MaxRequestsException(MESSAGES.USER.LOGIN.MAX_ATTEMPTS);
 
-    const passChangeInterval = moment(user.pass_changetime).fromNow().slice(0, 2); //this.calculateDateInterval(user.pass_changetime);
+    const passChangeInterval = moment(user.pass_changetime).fromNow().slice(0, 2); // this.calculateDateInterval(user.pass_changetime);
 
     if (passChangeInterval > 7) {
         return 'password expired';
