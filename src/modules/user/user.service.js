@@ -79,9 +79,9 @@ exports.getResponse = async (e) => {
 
 exports.login = async (email, password) => {
     const maxNumberOfFailedLogins = 3;
-    let timeWindowForFailedLogins = 60 * 60 * 1;
+    const timeWindowForFailedLogins = 60 * 60 * 1;
 
-    let user = await db.User.findOne({ where: { email: email } });
+    const user = await db.User.findOne({ where: { email: email } });
     if (!user) {
         throw new BadRequestException(MESSAGES.USER.LOGIN.INVALID_CREDS);
     }
@@ -103,7 +103,7 @@ exports.login = async (email, password) => {
         where: { UserId: user.UserId },
         order: [['createdAt', 'DESC']],
     });
-    let prev_pass = cred.map((pass) => pass.password);
+    const prev_pass = cred.map((pass) => pass.password);
 
     const passwordMatch = await bcrypt.verifyPassword(password, prev_pass[0]);
     if (!passwordMatch) {

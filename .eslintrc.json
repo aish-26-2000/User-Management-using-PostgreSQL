@@ -34,6 +34,14 @@
         "no-duplicate-imports": "error",
         "no-use-before-define": "error",
         // suggestions
-        "no-var": "error"
+        "no-var": "error",
+        "prefer-const": [
+            "error",
+            {
+                "destructuring": "any",
+                "ignoreReadBeforeAssign": false
+            }
+        ]
+        
     }
 }
