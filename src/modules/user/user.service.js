@@ -81,7 +81,7 @@ exports.login = async (email, password) => {
     const maxNumberOfFailedLogins = 3;
     const timeWindowForFailedLogins = 60 * 60 * 1;
 
-    const user = await db.User.findOne({ where: { email: email } });
+    let user = await db.User.findOne({ where: { email: email } });
     if (!user) {
         throw new BadRequestException(MESSAGES.USER.LOGIN.INVALID_CREDS);
     }
