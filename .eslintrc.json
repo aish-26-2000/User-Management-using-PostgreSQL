@@ -39,7 +39,7 @@
             "error",
             {
                 "destructuring": "any",
-                "ignoreReadBeforeAssign": true
+                "ignoreReadBeforeAssign": false
             }
         ]
         
