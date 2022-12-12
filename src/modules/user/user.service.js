@@ -79,7 +79,7 @@ exports.getResponse = async (e) => {
 
 exports.login = async (email, password) => {
     const maxNumberOfFailedLogins = 3;
-    const timeWindowForFailedLogins = 60 * 60 * 1;
+    let timeWindowForFailedLogins = 60 * 60 * 1;
 
     let user = await db.User.findOne({ where: { email: email } });
     if (!user) {
