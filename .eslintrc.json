@@ -10,9 +10,38 @@
         "ecmaVersion": "latest"
     },
     "rules": {
-        "linebreak-style": ["error", "WINDOWS"],
+        "linebreak-style": ["error", "windows"],
         "semi": ["error", "always"],
-        "no-console": "error",
-        "no-unused-vars": "error"
+        "spaced-comment": [
+            "error",
+            "always",
+            {
+                "line": {
+                    "markers": ["/"],
+                    "exceptions": ["-", "+"]
+                },
+                "block": {
+                    "markers": ["!"],
+                    "exceptions": ["*"],
+                    "balanced": true
+                }
+            }
+        ],
+        // possible problems
+        "no-const-assign": "error",
+        "no-undefined": "error",
+        "no-unused-vars": "error",
+        "no-duplicate-imports": "error",
+        "no-use-before-define": "error",
+        // suggestions
+        "no-var": "error",
+        "prefer-const": [
+            "error",
+            {
+                "destructuring": "any",
+                "ignoreReadBeforeAssign": false
+            }
+        ]
+        
     }
 }

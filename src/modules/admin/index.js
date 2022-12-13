@@ -3,5 +3,5 @@ const adminService = require('./admin.service');
 
 module.exports = {
     adminRoutes,
-    adminService
+    adminService,
 };

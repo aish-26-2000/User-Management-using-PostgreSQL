@@ -4,6 +4,7 @@ const PreconditionException = require('./precondition');
 const UnauthorizedException = require('./unauthorized');
 const UnHandledException = require('./unhandled');
 const ErrorResponse = require('./errorResponse');
+const MaxRequestsException = require('./tooManyRequests');
 
 module.exports = {
     BadRequestException,
@@ -12,4 +13,5 @@ module.exports = {
     UnauthorizedException,
     UnHandledException,
     ErrorResponse,
+    MaxRequestsException,
 };

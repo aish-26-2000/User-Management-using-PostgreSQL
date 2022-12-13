@@ -1,35 +1,32 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-    class user_consent extends Model {
+    class Business extends Model {
         // Helper method for defining associations.
         // This method is not a part of Sequelize lifecycle.
         // The `models/index` file will call this method automatically.
         static associate(model) {
-            user_consent.belongsTo(model.User, { foreignKey: 'UserId' });
-            user_consent.belongsTo(model.Agreement, { foreignKey: 'agreement_id' });
+            Business.hasMany(model.Business_Stage_Status, { foreignKey: 'bp_business_id' });
         }
     }
-    user_consent.init(
+    Business.init(
         {
-            user_consent_id: {
+            bp_business_id: {
                 allowNull: false,
                 autoIncrement: true,
                 primaryKey: true,
                 type: DataTypes.BIGINT,
             },
-            agreed: {
-                type: DataTypes.ENUM('Y', 'N'),
-                defaultValue: 'N',
+            bp_group_shortcode: {
+                type: DataTypes.ENUM('MEMBZ', 'MEMFI'),
+                allowNull: false,
             },
             is_active: {
                 type: DataTypes.ENUM('Y', 'N'),
                 defaultValue: 'Y',
-                allowNull: false,
             },
             createdAt: {
                 type: DataTypes.DATE,
-                allowNull: false,
             },
             createdBy: {
                 type: DataTypes.STRING,
@@ -37,27 +34,43 @@ module.exports = (sequelize, DataTypes) => {
             },
             updatedAt: {
                 type: DataTypes.DATE,
-                allowNull: false,
             },
             updatedBy: {
                 type: DataTypes.STRING,
+            },
+            name: {
+                type: DataTypes.STRING,
                 allowNull: false,
             },
-            UserId: {
-                type: DataTypes.BIGINT,
+            dba: {
+                type: DataTypes.STRING,
+                allowNull: true,
             },
-            agreement_id: {
-                type: DataTypes.BIGINT,
+            is_approved: {
+                type: DataTypes.ENUM('Y', 'N'),
+                defaultValue: 'N',
+            },
+            is_approved_vendor: {
+                type: DataTypes.ENUM('Y', 'N'),
+                defaultValue: 'N',
+            },
+            is_cannabis_business: {
+                type: DataTypes.ENUM('Y', 'N'),
+                defaultValue: 'Y',
+            },
+            is_createdby_stdc: {
+                type: DataTypes.ENUM('Y', 'N'),
+                defaultValue: 'N',
             },
         },
         {
             sequelize,
-            modelName: user_consent.name,
-            tableName: 'user_consent',
+            modelName: Business.name,
+            tableName: 'bp_business',
             paranoid: true,
             timestamps: true,
         }
     );
 
-    return user_consent;
+    return Business;
 };
