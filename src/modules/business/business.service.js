@@ -230,6 +230,14 @@ exports.allCountry = async () => {
     return data;
 };
 
+exports.allStates = async () => {
+    const data = await db.bt_region.findAndCountAll({
+        attributes: ['bt_region_id', 'bt_country_id', 'name'],
+        order: [['name', 'ASC']],
+    });
+    return data;
+};
+
 exports.user_association_types = async () => {
     const data = await db.bp_user_association.findAndCountAll({
         attributes: ['bp_user_association_id', 'name'],
@@ -241,5 +249,24 @@ exports.investor_type = async () => {
     const data = await db.bp_investor_type.findAndCountAll({
         attributes: ['bp_investor_type_id', 'name'],
     });
+    return data;
+};
+
+exports.entity_type = async () => {
+    const data = await db.bp_entity_type.findAndCountAll({
+        attributes: ['bp_entity_type_id', 'name'],
+    });
+    return data;
+};
+
+exports.license_type = async () => {
+    const data = await db.bp_license_type.findAndCountAll({
+        attributes: ['bp_license_type_id', 'is_accredited', 'name'],
+    });
+    return data;
+};
+
+exports.license_category = async () => {
+    const data = await db.bp_license_type_desig.findAndCountAll();
     return data;
 };

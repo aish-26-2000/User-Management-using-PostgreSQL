@@ -8,6 +8,10 @@ const {
     investor_type,
     allZipcodes,
     allCountry,
+    allStates,
+    license_type,
+    license_category,
+    entity_type,
 } = require('./business.service');
 
 exports.getAllBusinessList = async (req, res, next) => {
@@ -104,6 +108,20 @@ exports.getCountry = async (req, res, next) => {
     }
 };
 
+exports.getAllStates = async (req, res, next) => {
+    try {
+        const response = await allStates();
+
+        if (!response) {
+            responseHelper.fail(res, 'No response to show');
+        }
+
+        responseHelper.success(res, response, 'Success');
+    } catch (err) {
+        next(err);
+    }
+};
+
 exports.getZipcodes = async (req, res, next) => {
     try {
         const response = await allZipcodes();
@@ -135,6 +153,48 @@ exports.getUserAssociationTypes = async (req, res, next) => {
 exports.getInvestorType = async (req, res, next) => {
     try {
         const response = await investor_type();
+
+        if (!response) {
+            responseHelper.fail(res, 'No response to show');
+        }
+
+        responseHelper.success(res, response, 'Success');
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.getEntityType = async (req, res, next) => {
+    try {
+        const response = await entity_type();
+
+        if (!response) {
+            responseHelper.fail(res, 'No response to show');
+        }
+
+        responseHelper.success(res, response, 'Success');
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.getLicenseType = async (req, res, next) => {
+    try {
+        const response = await license_type();
+
+        if (!response) {
+            responseHelper.fail(res, 'No response to show');
+        }
+
+        responseHelper.success(res, response, 'Success');
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.getLicenseCategory = async (req, res, next) => {
+    try {
+        const response = await license_category();
 
         if (!response) {
             responseHelper.fail(res, 'No response to show');
