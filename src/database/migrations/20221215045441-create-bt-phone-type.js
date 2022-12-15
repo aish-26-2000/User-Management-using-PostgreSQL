@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await queryInterface.createTable('bt_phone_types', {
+        await queryInterface.createTable('bt_phone_type', {
             id: {
                 allowNull: false,
                 autoIncrement: true,
@@ -11,6 +11,7 @@ module.exports = {
             },
             bt_phonetype_id: {
                 type: Sequelize.UUID,
+                unique: true,
             },
             is_active: {
                 type: Sequelize.STRING,
@@ -21,10 +22,16 @@ module.exports = {
             description: {
                 type: Sequelize.STRING,
             },
-            createdBy: {
+            created: {
+                type: Sequelize.DATE,
+            },
+            createdby: {
                 type: Sequelize.STRING,
             },
-            updatedBy: {
+            updated: {
+                type: Sequelize.DATE,
+            },
+            updatedby: {
                 type: Sequelize.STRING,
             },
             shortcode: {
@@ -33,17 +40,9 @@ module.exports = {
             sequenceno: {
                 type: Sequelize.INTEGER,
             },
-            createdAt: {
-                allowNull: false,
-                type: Sequelize.DATE,
-            },
-            updatedAt: {
-                allowNull: false,
-                type: Sequelize.DATE,
-            },
         });
     },
     async down(queryInterface) {
-        await queryInterface.dropTable('bt_phone_types');
+        await queryInterface.dropTable('bt_phone_type');
     },
 };

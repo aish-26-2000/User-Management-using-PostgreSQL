@@ -205,3 +205,41 @@ exports.addNonCannabisBusiness = async (data) => {
         };
     }
 };
+
+exports.allPhoneTypes = async () => {
+    const data = await db.bt_phone_type.findAndCountAll({
+        attributes: ['bt_phonetype_id', 'name'],
+    });
+    return data;
+};
+
+exports.allZipcodes = async () => {
+    const data = await db.bt_zipcodes.findAndCountAll({
+        attributes: ['bt_zipcodes_id', 'zipcode', 'city', 'county'],
+    });
+    return data;
+};
+
+exports.allCountry = async () => {
+    const data = await db.bt_country.findAll({
+        where: {
+            name: 'United States of America',
+        },
+        attributes: ['bt_country_id', 'name'],
+    });
+    return data;
+};
+
+exports.user_association_types = async () => {
+    const data = await db.bp_user_association.findAndCountAll({
+        attributes: ['bp_user_association_id', 'name'],
+    });
+    return data;
+};
+
+exports.investor_type = async () => {
+    const data = await db.bp_investor_type.findAndCountAll({
+        attributes: ['bp_investor_type_id', 'name'],
+    });
+    return data;
+};

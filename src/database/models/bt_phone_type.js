@@ -14,14 +14,18 @@ module.exports = (sequelize, DataTypes) => {
             is_active: DataTypes.STRING,
             name: DataTypes.STRING,
             description: DataTypes.STRING,
-            createdBy: DataTypes.STRING,
-            updatedBy: DataTypes.STRING,
+            created: DataTypes.DATE,
+            createdby: DataTypes.STRING,
+            updated: DataTypes.DATE,
+            updatedby: DataTypes.STRING,
             shortcode: DataTypes.STRING,
             sequenceno: DataTypes.INTEGER,
         },
         {
             sequelize,
-            modelName: 'bt_phone_type',
+            modelName: bt_phone_type.name,
+            tableName: 'bt_phone_type',
+            timestamps: false,
         }
     );
     return bt_phone_type;

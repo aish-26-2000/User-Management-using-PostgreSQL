@@ -1,5 +1,14 @@
 const { responseHelper } = require('../../helpers');
-const { getAllBusiness, addNonCannabisBusiness, addCannabisBusiness } = require('./business.service');
+const {
+    getAllBusiness,
+    addNonCannabisBusiness,
+    addCannabisBusiness,
+    allPhoneTypes,
+    user_association_types,
+    investor_type,
+    allZipcodes,
+    allCountry,
+} = require('./business.service');
 
 exports.getAllBusinessList = async (req, res, next) => {
     try {
@@ -62,6 +71,76 @@ exports.registerNonCannabisBusiness = async (req, res, next) => {
         }
 
         responseHelper.success(res, response, 'Non-Cannabis Business added successfully.');
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.getPhoneType = async (req, res, next) => {
+    try {
+        const response = await allPhoneTypes();
+
+        if (!response) {
+            responseHelper.fail(res, 'No response to show');
+        }
+
+        responseHelper.success(res, response, 'Success');
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.getCountry = async (req, res, next) => {
+    try {
+        const response = await allCountry();
+
+        if (!response) {
+            responseHelper.fail(res, 'No response to show');
+        }
+
+        responseHelper.success(res, response, 'Success');
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.getZipcodes = async (req, res, next) => {
+    try {
+        const response = await allZipcodes();
+
+        if (!response) {
+            responseHelper.fail(res, 'No response to show');
+        }
+
+        responseHelper.success(res, response, 'Success');
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.getUserAssociationTypes = async (req, res, next) => {
+    try {
+        const response = await user_association_types();
+
+        if (!response) {
+            responseHelper.fail(res, 'No response to show');
+        }
+
+        responseHelper.success(res, response, 'Success');
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.getInvestorType = async (req, res, next) => {
+    try {
+        const response = await investor_type();
+
+        if (!response) {
+            responseHelper.fail(res, 'No response to show');
+        }
+
+        responseHelper.success(res, response, 'Success');
     } catch (err) {
         next(err);
     }
