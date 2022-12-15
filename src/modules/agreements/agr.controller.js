@@ -19,7 +19,7 @@ exports.addAgreement = async (req, res, next) => {
         const response = await agrService.addAgreement(data);
 
         if (response) {
-            responseHelper.success(res, (message = 'Agreement successfully added'));
+            responseHelper.success(res, 'Agreement successfully added');
         }
 
         if (!response) {
@@ -47,7 +47,7 @@ exports.updateAgreement = async (req, res, next) => {
             responseHelper.fail(res, 'Something Wrong happened. Agreeement not updated');
         }
 
-        //compose email
+        // compose email
         const message = `We've updated our Terms and Conditions. The updated terms are for ${data.title}`;
         const html = `<!doctype html>
         <html ⚡4email>
@@ -62,7 +62,7 @@ exports.updateAgreement = async (req, res, next) => {
         </html>`;
         const mailList = await agrService.usersList();
 
-        //send notification
+        // send notification
         await sendEmail({
             from: 'ADMIN <admin@standardc.com>',
             to: mailList,

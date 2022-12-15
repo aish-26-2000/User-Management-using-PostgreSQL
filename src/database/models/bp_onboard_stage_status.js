@@ -6,16 +6,16 @@ module.exports = (sequelize, DataTypes) => {
         // This method is not a part of Sequelize lifecycle.
         // The `models/index` file will call this method automatically.
         static associate(model) {
-            Business_Stage_Status.belongsTo(model.Business, { foreignKey: 'bp_business_id' });
+            Business_Stage_Status.belongsTo(model.Business, { foreignKey: 'business_id' });
         }
     }
     Business_Stage_Status.init(
         {
             bp_onboard_stage_status_id: {
                 allowNull: false,
-                autoIncrement: true,
                 primaryKey: true,
-                type: DataTypes.BIGINT,
+                type: DataTypes.UUID,
+                defaultValue: DataTypes.UUIDV4,
             },
             is_active: {
                 type: DataTypes.ENUM('Y', 'N'),
@@ -42,9 +42,9 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
-            bp_business_id: {
-                type: DataTypes.BIGINT,
+            business_id: {
                 allowNull: false,
+                type: DataTypes.BIGINT,
             },
         },
         {

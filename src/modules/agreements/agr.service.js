@@ -18,12 +18,12 @@ exports.updateAgreement = async (id, data) => {
 
 exports.usersList = async () => {
     const users = await db.User.findAll();
-    let list = users.map((user) => user.email);
+    const list = users.map((user) => user.email);
     return list;
 };
 
 exports.getAllAgreements = async () => {
-    const data = await db.Agreement.findAll({
+    const data = await db.Agreement.findAndCountAll({
         order: [['priority', 'ASC']],
     });
 
@@ -62,13 +62,13 @@ exports.createUserConsent = async (email) => {
     });
 };
 
-exports.updateUserConsent = async (userid, agreementid) => {
+exports.updateUserConsent = async (userid /* agreementid */) => {
     const user = await db.user_consent.findOne({ where: { UserId: userid } });
 
     if (user) {
         await db.user_consent.update(
             {
-                //agreement_id : agreementid,
+                // agreement_id : agreementid,
                 agreed: 'Y',
             },
             {
