@@ -10,7 +10,7 @@
 
 #others
 /data
-/src/database/seeders
+#/src/database/seeders
 .eslintcache
 .eslintignore
 .prettierrc
