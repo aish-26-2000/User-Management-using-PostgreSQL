@@ -19,7 +19,6 @@ const businessSchema = {
         body: Joi.object().keys({
             name: Joi.string().trim().min(3).max(50).trim().required(),
             dba: Joi.string().trim().min(3).max(50).trim().required(),
-            code: Joi.string().trim().max(5).trim().required(),
             creator: Joi.string().trim().min(3).max(50).trim().required(),
         }),
     },

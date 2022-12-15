@@ -1,5 +1,5 @@
 const { responseHelper } = require('../../helpers');
-const { getAllBusiness, addBusiness } = require('./business.service');
+const { getAllBusiness, addNonCannabisBusiness, addCannabisBusiness } = require('./business.service');
 
 exports.getAllBusinessList = async (req, res, next) => {
     try {
@@ -17,25 +17,51 @@ exports.getAllBusinessList = async (req, res, next) => {
     }
 };
 
-exports.addNewBusiness = async (req, res, next) => {
+exports.registerCannabisBusiness = async (req, res, next) => {
     try {
-        const { name, dba, code, creator } = req.body;
+        const { name, dba, creator } = req.body;
         const data = {
             name: name,
             dba: dba,
-            bp_group_shortcode: code,
+            bp_group_shortcode: 'MEMBZ',
             createdBy: creator,
             updatedBy: creator,
             is_createdby_stdc: 'Y',
+            is_cannabis_business: 'Y',
         };
 
-        const response = await addBusiness(data);
+        const response = await addCannabisBusiness(data);
 
         if (!response) {
             responseHelper.fail(res, 'Error, Business not added.');
         }
 
-        responseHelper.success(res, response, 'Business added successfully.');
+        responseHelper.success(res, response, 'Cannabis Business added successfully.');
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.registerNonCannabisBusiness = async (req, res, next) => {
+    try {
+        const { name, dba, creator } = req.body;
+        const data = {
+            name: name,
+            dba: dba,
+            bp_group_shortcode: 'MEMBZ',
+            createdBy: creator,
+            updatedBy: creator,
+            is_createdby_stdc: 'Y',
+            is_cannabis_business: 'N',
+        };
+
+        const response = await addNonCannabisBusiness(data);
+
+        if (!response) {
+            responseHelper.fail(res, 'Error, Business not added.');
+        }
+
+        responseHelper.success(res, response, 'Non-Cannabis Business added successfully.');
     } catch (err) {
         next(err);
     }

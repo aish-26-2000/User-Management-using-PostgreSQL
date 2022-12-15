@@ -6,15 +6,20 @@ module.exports = (sequelize, DataTypes) => {
         // This method is not a part of Sequelize lifecycle.
         // The `models/index` file will call this method automatically.
         static associate(model) {
-            Business.hasMany(model.Business_Stage_Status, { foreignKey: 'bp_business_id' });
+            Business.hasMany(model.Business_Stage_Status, { foreignKey: 'business_id' });
         }
     }
     Business.init(
         {
             bp_business_id: {
                 allowNull: false,
-                autoIncrement: true,
+                type: DataTypes.UUID,
+                defaultValue: DataTypes.UUIDV4,
+            },
+            business_id: {
+                allowNull: false,
                 primaryKey: true,
+                autoIncrement: true,
                 type: DataTypes.BIGINT,
             },
             bp_group_shortcode: {
@@ -41,6 +46,7 @@ module.exports = (sequelize, DataTypes) => {
             name: {
                 type: DataTypes.STRING,
                 allowNull: false,
+                unique: true,
             },
             dba: {
                 type: DataTypes.STRING,

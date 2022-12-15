@@ -9,6 +9,8 @@
 /logs
 
 #others
+/data
+/src/database/seeders
 .eslintcache
 .eslintignore
 .prettierrc
