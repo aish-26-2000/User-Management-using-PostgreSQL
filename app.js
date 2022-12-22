@@ -55,13 +55,11 @@ app.use(errorHandler);
 
 process.on('uncaughtException', function (err) {
     logger.error(err);
-    console.log(err);
 });
 
 // eslint-disable-next-line no-unused-vars
 process.on('unhandledRejection', function (reason, p) {
     logger.error(reason);
-    console.log(reason);
 });
 
 module.exports = app;

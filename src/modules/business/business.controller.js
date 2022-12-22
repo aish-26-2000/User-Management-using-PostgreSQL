@@ -192,12 +192,22 @@ exports.getLicenseCategory = async (req, res, next) => {
 exports.findZip = async (req, res, next) => {
     const data = req.body;
 
-    const zipcode = data.contact_details.legal_address.zipcode;
+    const zipcode_1 = data.contact_details.legal_address.zipcode;
 
-    const isValid = await checkZipcode(zipcode);
+    const isZip1Valid = await checkZipcode(zipcode_1);
 
-    if (!isValid || isValid === 'undefined') {
-        return responseHelper.fail(res, 'Invalid Zipcode');
+    if (!isZip1Valid || isZip1Valid === 'undefined') {
+        return responseHelper.fail(res, 'Invalid Legal Address Zipcode');
+    }
+
+    if (data.contact_details.business_location.is_primary_business_location_same_as_Legal_address === 'N') {
+        const zipcode_2 = data.contact_details.business_location.zipcode;
+
+        const isZip2Valid = await checkZipcode(zipcode_2);
+
+        if (!isZip2Valid || isZip2Valid === 'undefined') {
+            return responseHelper.fail(res, 'Invalid Business Premise Zipcode');
+        }
     }
 
     next();
