@@ -1,33 +1,27 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-    class Business extends Model {
+    class Business_Other_Addr extends Model {
         // Helper method for defining associations.
         // This method is not a part of Sequelize lifecycle.
         // The `models/index` file will call this method automatically.
         static associate(model) {
-            Business.hasMany(model.Business_Stage_Status, { foreignKey: 'business_id' });
-            Business.hasMany(model.Business_License, { foreignKey: 'business_id' });
-            Business.hasMany(model.Business_Phone, { foreignKey: 'business_id' });
-            Business.hasMany(model.Business_Other_Addr, { foreignKey: 'business_id' });
+            Business_Other_Addr.belongsTo(model.Business_Address, { foreignKey: 'address_id' });
+            Business_Other_Addr.belongsTo(model.Business, { foreignKey: 'business_id' });
         }
     }
-    Business.init(
+    Business_Other_Addr.init(
         {
-            bp_business_id: {
+            bp_business_other_addr_id: {
                 allowNull: false,
                 type: DataTypes.UUID,
                 defaultValue: DataTypes.UUIDV4,
             },
-            business_id: {
+            business_other_addr_id: {
                 allowNull: false,
                 primaryKey: true,
                 autoIncrement: true,
                 type: DataTypes.BIGINT,
-            },
-            bp_group_shortcode: {
-                type: DataTypes.ENUM('MEMBZ', 'MEMFI'),
-                allowNull: false,
             },
             is_active: {
                 type: DataTypes.ENUM('Y', 'N'),
@@ -49,37 +43,24 @@ module.exports = (sequelize, DataTypes) => {
             name: {
                 type: DataTypes.STRING,
                 allowNull: false,
-                unique: true,
             },
-            dba: {
-                type: DataTypes.STRING,
-                allowNull: true,
+            business_id: {
+                allowNull: false,
+                type: DataTypes.BIGINT,
             },
-            is_approved: {
-                type: DataTypes.ENUM('Y', 'N'),
-                defaultValue: 'N',
-            },
-            is_approved_vendor: {
-                type: DataTypes.ENUM('Y', 'N'),
-                defaultValue: 'N',
-            },
-            is_cannabis_business: {
-                type: DataTypes.ENUM('Y', 'N'),
-                defaultValue: 'Y',
-            },
-            is_createdby_stdc: {
-                type: DataTypes.ENUM('Y', 'N'),
-                defaultValue: 'N',
+            address_id: {
+                allowNull: false,
+                type: DataTypes.BIGINT,
             },
         },
         {
             sequelize,
-            modelName: Business.name,
-            tableName: 'bp_business',
+            modelName: Business_Other_Addr.name,
+            tableName: 'bp_business_other_addr',
             paranoid: true,
             timestamps: true,
         }
     );
 
-    return Business;
+    return Business_Other_Addr;
 };

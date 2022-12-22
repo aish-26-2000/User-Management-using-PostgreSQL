@@ -3,7 +3,7 @@
 module.exports = {
     async up(queryInterface, Sequelize) {
         await queryInterface.createTable('bp_license_type', {
-            id: {
+            license_type_id: {
                 allowNull: false,
                 autoIncrement: true,
                 primaryKey: true,

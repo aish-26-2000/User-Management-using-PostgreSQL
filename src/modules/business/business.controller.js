@@ -12,6 +12,7 @@ const {
     license_type,
     license_category,
     entity_type,
+    checkZipcode,
 } = require('./business.service');
 
 exports.getAllBusinessList = async (req, res, next) => {
@@ -32,16 +33,7 @@ exports.getAllBusinessList = async (req, res, next) => {
 
 exports.registerCannabisBusiness = async (req, res, next) => {
     try {
-        const { name, dba, creator } = req.body;
-        const data = {
-            name: name,
-            dba: dba,
-            bp_group_shortcode: 'MEMBZ',
-            createdBy: creator,
-            updatedBy: creator,
-            is_createdby_stdc: 'Y',
-            is_cannabis_business: 'Y',
-        };
+        const data = req.body;
 
         const response = await addCannabisBusiness(data);
 
@@ -57,16 +49,7 @@ exports.registerCannabisBusiness = async (req, res, next) => {
 
 exports.registerNonCannabisBusiness = async (req, res, next) => {
     try {
-        const { name, dba, creator } = req.body;
-        const data = {
-            name: name,
-            dba: dba,
-            bp_group_shortcode: 'MEMBZ',
-            createdBy: creator,
-            updatedBy: creator,
-            is_createdby_stdc: 'Y',
-            is_cannabis_business: 'N',
-        };
+        const data = req.body;
 
         const response = await addNonCannabisBusiness(data);
 
@@ -204,4 +187,18 @@ exports.getLicenseCategory = async (req, res, next) => {
     } catch (err) {
         next(err);
     }
+};
+
+exports.findZip = async (req, res, next) => {
+    const data = req.body;
+
+    const zipcode = data.contact_details.legal_address.zipcode;
+
+    const isValid = await checkZipcode(zipcode);
+
+    if (!isValid || isValid === 'undefined') {
+        return responseHelper.fail(res, 'Invalid Zipcode');
+    }
+
+    next();
 };

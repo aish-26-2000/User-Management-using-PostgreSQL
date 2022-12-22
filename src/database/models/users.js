@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
             User.hasMany(model.userActivity, { foreignKey: 'UserId' });
             User.hasMany(model.user_consent, { foreignKey: 'UserId' });
             User.hasMany(model.user_cred, { foreignKey: 'UserId' });
+            User.hasMany(model.Business_User_Assoc, { foreignKey: 'UserId' });
         }
     }
     User.init(

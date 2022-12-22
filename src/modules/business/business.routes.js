@@ -13,6 +13,7 @@ const {
     getLicenseType,
     getLicenseCategory,
     getEntityType,
+    findZip,
 } = require('./business.controller');
 const { businessSchema } = require('./business.validation');
 
@@ -31,7 +32,8 @@ router.get('/licenseType', getLicenseType);
 router.get('/licenseCategory', getLicenseCategory);
 
 // add
-router.post('/regCannabisBusiness', validationMiddleware(businessSchema.newBusiness), registerCannabisBusiness);
-router.post('/regNonCannabisBusiness', validationMiddleware(businessSchema.newBusiness), registerNonCannabisBusiness);
+router.use(['/regCannabisBusiness', '/regNonCannabisBusiness'], findZip);
+router.post('/regCannabisBusiness', validationMiddleware(businessSchema.cannabisBusiness), registerCannabisBusiness);
+router.post('/regNonCannabisBusiness', validationMiddleware(businessSchema.nonCannabisBusiness), registerNonCannabisBusiness);
 
 module.exports = router;

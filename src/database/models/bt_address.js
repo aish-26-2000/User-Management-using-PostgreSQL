@@ -1,33 +1,27 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-    class Business extends Model {
+    class Business_Address extends Model {
         // Helper method for defining associations.
         // This method is not a part of Sequelize lifecycle.
         // The `models/index` file will call this method automatically.
         static associate(model) {
-            Business.hasMany(model.Business_Stage_Status, { foreignKey: 'business_id' });
-            Business.hasMany(model.Business_License, { foreignKey: 'business_id' });
-            Business.hasMany(model.Business_Phone, { foreignKey: 'business_id' });
-            Business.hasMany(model.Business_Other_Addr, { foreignKey: 'business_id' });
+            Business_Address.hasMany(model.Business_Other_Addr, { foreignKey: 'address_id' });
+            Business_Address.belongsTo(model.bt_zipcodes, { foreignKey: 'zipcodes_id' });
         }
     }
-    Business.init(
+    Business_Address.init(
         {
-            bp_business_id: {
+            bt_address_id: {
                 allowNull: false,
                 type: DataTypes.UUID,
                 defaultValue: DataTypes.UUIDV4,
             },
-            business_id: {
+            address_id: {
                 allowNull: false,
                 primaryKey: true,
                 autoIncrement: true,
                 type: DataTypes.BIGINT,
-            },
-            bp_group_shortcode: {
-                type: DataTypes.ENUM('MEMBZ', 'MEMFI'),
-                allowNull: false,
             },
             is_active: {
                 type: DataTypes.ENUM('Y', 'N'),
@@ -46,40 +40,28 @@ module.exports = (sequelize, DataTypes) => {
             updatedBy: {
                 type: DataTypes.STRING,
             },
-            name: {
+            address1: {
                 type: DataTypes.STRING,
                 allowNull: false,
-                unique: true,
             },
-            dba: {
+            address2: {
                 type: DataTypes.STRING,
-                allowNull: true,
             },
-            is_approved: {
-                type: DataTypes.ENUM('Y', 'N'),
-                defaultValue: 'N',
+            zipcodes_id: {
+                type: DataTypes.BIGINT,
             },
-            is_approved_vendor: {
-                type: DataTypes.ENUM('Y', 'N'),
-                defaultValue: 'N',
-            },
-            is_cannabis_business: {
-                type: DataTypes.ENUM('Y', 'N'),
-                defaultValue: 'Y',
-            },
-            is_createdby_stdc: {
-                type: DataTypes.ENUM('Y', 'N'),
-                defaultValue: 'N',
+            street_no: {
+                type: DataTypes.STRING,
             },
         },
         {
             sequelize,
-            modelName: Business.name,
-            tableName: 'bp_business',
+            modelName: Business_Address.name,
+            tableName: 'bt_address',
             paranoid: true,
             timestamps: true,
         }
     );
 
-    return Business;
+    return Business_Address;
 };
