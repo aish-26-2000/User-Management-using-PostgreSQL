@@ -163,13 +163,14 @@ exports.getAllBusiness = async (page, size, sort_column, sort_order, filterby, q
 };
 
 exports.addCannabisBusiness = async (data) => {
+    const user = await db.User.findOne({ where: { email: data.basic_details.creator_email } });
     // basic details
     const basic_data = {
         name: data.basic_details.name,
         dba: data.basic_details.dba,
         bp_group_shortcode: 'MEMBZ',
-        createdBy: data.basic_details.creator,
-        updatedBy: data.basic_details.creator,
+        createdBy: user.fullName,
+        updatedBy: user.fullName,
         is_createdby_stdc: 'Y',
         is_cannabis_business: 'Y',
     };
@@ -179,8 +180,8 @@ exports.addCannabisBusiness = async (data) => {
     const license = await db.bp_license_type.findOne({ where: { name: data.cannabis_related_details.license_type } });
     const license_data = {
         is_active: 'Y',
-        createdBy: data.basic_details.creator,
-        updatedBy: data.basic_details.creator,
+        createdBy: user.fullName,
+        updatedBy: user.fullName,
         business_id: basic_details.business_id,
         license_type_id: license.id,
         license_type_comment: data.cannabis_related_details.license_type,
@@ -194,22 +195,22 @@ exports.addCannabisBusiness = async (data) => {
     const phone_type = await db.bt_phone_type.findOne({ where: { name: data.contact_details.legal_address.phone_type } });
     await db.Business_Phone.create({
         is_active: 'Y',
-        createdBy: data.basic_details.creator,
-        updatedBy: data.basic_details.creator,
+        createdBy: user.fullName,
+        updatedBy: user.fullName,
         phone: data.contact_details.legal_address.phone_number,
         phone_type_id: phone_type.id,
         business_id: basic_details.business_id,
     });
 
     // business location
-    if (data.contact_details.business_location.is_primary_business_location_same_as_Legal_address === 'N') {
+    if (data.contact_details.business_location.is_primary_business_location_same_as_legal_address === 'N') {
         const business_loc = await this.addBusinessLocation(data);
 
         const phone_type = await db.bt_phone_type.findOne({ where: { name: data.contact_details.legal_address.phone_type } });
         await db.Business_Phone.create({
             is_active: 'Y',
-            createdBy: data.basic_details.creator,
-            updatedBy: data.basic_details.creator,
+            createdBy: user.fullName,
+            updatedBy: user.fullName,
             phone: data.contact_details.legal_address.phone_number,
             phone_type_id: phone_type.id,
             business_id: basic_details.business_id,
@@ -217,8 +218,8 @@ exports.addCannabisBusiness = async (data) => {
 
         await db.Business_Other_Addr.create({
             is_active: 'Y',
-            createdBy: data.basic_details.creator,
-            updatedBy: data.basic_details.creator,
+            createdBy: user.fullName,
+            updatedBy: user.fullName,
             name: 'Business-Premise-Address',
             business_id: basic_details.business_id,
             address_id: business_loc.address_id,
@@ -226,11 +227,75 @@ exports.addCannabisBusiness = async (data) => {
     }
 
     // key person registration
+    await db.Business_User_Assoc.create({
+        is_active: 'Y',
+        createdBy: user.fullName,
+        updatedBy: user.fullName,
+        description: 'Controlling Managers & Operators',
+        ownership_percent: 0,
+        user_assoc_role: 'Admin',
+        UserId: user.UserId,
+        business_id: basic_details.business_id,
+        user_assoc_id: 3,
+        is_contact_person: 'Y',
+    });
+
+    if (data.key_person_registration.add_user === 'Y') {
+        const user = await db.User.findOne({ where: { email: data.key_person_registration.email } });
+        const user_assoc = await db.bp_user_association.findOne({ where: { name: data.key_person_registration.user_type } });
+
+        if (data.key_person_registration.user_type === 'Beneficial owner') {
+            await db.Business_User_Assoc.create({
+                is_active: 'Y',
+                createdBy: user.fullName,
+                updatedBy: user.fullName,
+                description: 'Beneficial owner',
+                ownership_percent: data.key_person_registration.ownership_percentage,
+                user_assoc_role: data.key_person_registration.access_type,
+                UserId: user.UserId,
+                business_id: basic_details.business_id,
+                user_assoc_id: user_assoc.id,
+                is_contact_person: data.key_person_registration.set_as_contact_person,
+            });
+        }
+
+        if (data.key_person_registration.user_type === 'Controlling Managers & Operators') {
+            await db.Business_User_Assoc.create({
+                is_active: 'Y',
+                createdBy: user.fullName,
+                updatedBy: user.fullName,
+                description: 'Controlling Managers & Operators',
+                ownership_percent: 0,
+                user_assoc_role: data.key_person_registration.access_type,
+                UserId: user.UserId,
+                business_id: basic_details.business_id,
+                user_assoc_id: user_assoc.id,
+                is_contact_person: data.key_person_registration.set_as_contact_person,
+            });
+        }
+
+        if (data.key_person_registration.user_type === 'Investor') {
+            const investor_type = await db.bp_investor_type.findOne({ where: { name: data.key_person_registration.investor_type } });
+            await db.Business_User_Assoc.create({
+                is_active: 'Y',
+                createdBy: user.fullName,
+                updatedBy: user.fullName,
+                description: 'Investor',
+                ownership_percent: 0,
+                user_assoc_role: data.key_person_registration.access_type,
+                UserId: user.UserId,
+                business_id: basic_details.business_id,
+                investor_type_id: investor_type.id,
+                user_assoc_id: user_assoc.id,
+                is_contact_person: data.key_person_registration.set_as_contact_person,
+            });
+        }
+    }
 
     if (basic_details && cannabis_details && contact_details) {
         await db.Business_Stage_Status.create({
-            createdBy: basic_details.createdBy,
-            updatedBy: basic_details.updatedBy,
+            createdBy: user.fullName,
+            updatedBy: user.fullName,
             stage: 'Membership',
             status: 'Inactive',
             bp_business_id: basic_details.bp_business_id,
@@ -247,13 +312,14 @@ exports.addCannabisBusiness = async (data) => {
 };
 
 exports.addNonCannabisBusiness = async (data) => {
+    const user = await db.User.findOne({ where: { email: data.basic_details.creator_email } });
     // basic details
     const basic_data = {
         name: data.basic_details.name,
         dba: data.basic_details.dba,
         bp_group_shortcode: 'MEMBZ',
-        createdBy: data.basic_details.creator,
-        updatedBy: data.basic_details.creator,
+        createdBy: user.fullName,
+        updatedBy: user.fullName,
         is_createdby_stdc: 'Y',
         is_cannabis_business: 'Y',
     };
@@ -266,22 +332,22 @@ exports.addNonCannabisBusiness = async (data) => {
     const phone_type = await db.bt_phone_type.findOne({ where: { name: data.contact_details.legal_address.phone_type } });
     await db.Business_Phone.create({
         is_active: 'Y',
-        createdBy: data.basic_details.creator,
-        updatedBy: data.basic_details.creator,
+        createdBy: user.fullName,
+        updatedBy: user.fullName,
         phone: data.contact_details.legal_address.phone_number,
         phone_type_id: phone_type.id,
         business_id: basic_details.business_id,
     });
 
     // business location
-    if (data.contact_details.business_location.is_primary_business_location_same_as_Legal_address === 'N') {
+    if (data.contact_details.business_location.is_primary_business_location_same_as_legal_address === 'N') {
         const business_loc = await this.addBusinessLocation(data);
 
         const phone_type = await db.bt_phone_type.findOne({ where: { name: data.contact_details.legal_address.phone_type } });
         await db.Business_Phone.create({
             is_active: 'Y',
-            createdBy: data.basic_details.creator,
-            updatedBy: data.basic_details.creator,
+            createdBy: user.fullName,
+            updatedBy: user.fullName,
             phone: data.contact_details.legal_address.phone_number,
             phone_type_id: phone_type.id,
             business_id: basic_details.business_id,
@@ -289,8 +355,8 @@ exports.addNonCannabisBusiness = async (data) => {
 
         await db.Business_Other_Addr.create({
             is_active: 'Y',
-            createdBy: data.basic_details.creator,
-            updatedBy: data.basic_details.creator,
+            createdBy: user.fullName,
+            updatedBy: user.fullName,
             name: 'Business-Premise-Address',
             business_id: basic_details.business_id,
             address_id: business_loc.address_id,
@@ -298,31 +364,69 @@ exports.addNonCannabisBusiness = async (data) => {
     }
 
     // key person registration
-    if (data.key_person_registration.edit_details === 'N') {
-        const user = await db.User.findOne({ where: { fullName: data.basic_details.name } });
-        await db.Business_User_Assoc.create({
-            is_active: 'Y',
-            createdBy: data.basic_details.creator,
-            updatedBy: data.basic_details.creator,
-            description: 'Controlling Managers & Operators',
-            UserId: user.UserId,
-            business_id: basic_details.business_id,
-            user_assoc_id: 3,
-        });
-    }
+    await db.Business_User_Assoc.create({
+        is_active: 'Y',
+        createdBy: user.fullName,
+        updatedBy: user.fullName,
+        description: 'Controlling Managers & Operators',
+        ownership_percent: 0,
+        user_assoc_role: 'Admin',
+        UserId: user.UserId,
+        business_id: basic_details.business_id,
+        user_assoc_id: 3,
+        is_contact_person: 'Y',
+    });
 
-    if (data.key_person_registration.edit_details === 'Y') {
-        const user = await db.User.findOne({ where: { fullName: data.basic_details.name } });
+    if (data.key_person_registration.add_user === 'Y') {
+        const user = await db.User.findOne({ where: { email: data.key_person_registration.email } });
         const user_assoc = await db.bp_user_association.findOne({ where: { name: data.key_person_registration.user_type } });
-        await db.Business_User_Assoc.create({
-            is_active: 'Y',
-            createdBy: data.basic_details.creator,
-            updatedBy: data.basic_details.creator,
-            description: data.key_person_registration.user_type,
-            UserId: user.UserId,
-            business_id: basic_details.business_id,
-            user_assoc_id: user_assoc.id,
-        });
+
+        if (data.key_person_registration.user_type === 'Beneficial owner') {
+            await db.Business_User_Assoc.create({
+                is_active: 'Y',
+                createdBy: user.fullName,
+                updatedBy: user.fullName,
+                description: 'Beneficial owner',
+                ownership_percent: data.key_person_registration.ownership_percentage,
+                user_assoc_role: data.key_person_registration.access_type,
+                UserId: user.UserId,
+                business_id: basic_details.business_id,
+                user_assoc_id: user_assoc.id,
+                is_contact_person: data.key_person_registration.set_as_contact_person,
+            });
+        }
+
+        if (data.key_person_registration.user_type === 'Controlling Managers & Operators') {
+            await db.Business_User_Assoc.create({
+                is_active: 'Y',
+                createdBy: user.fullName,
+                updatedBy: user.fullName,
+                description: 'Controlling Managers & Operators',
+                ownership_percent: 0,
+                user_assoc_role: data.key_person_registration.access_type,
+                UserId: user.UserId,
+                business_id: basic_details.business_id,
+                user_assoc_id: user_assoc.id,
+                is_contact_person: data.key_person_registration.set_as_contact_person,
+            });
+        }
+
+        if (data.key_person_registration.user_type === 'Investor') {
+            const investor_type = await db.bp_investor_type.findOne({ where: { name: data.key_person_registration.investor_type } });
+            await db.Business_User_Assoc.create({
+                is_active: 'Y',
+                createdBy: user.fullName,
+                updatedBy: user.fullName,
+                description: 'Investor',
+                ownership_percent: 0,
+                user_assoc_role: data.key_person_registration.access_type,
+                UserId: user.UserId,
+                business_id: basic_details.business_id,
+                investor_type_id: investor_type.id,
+                user_assoc_id: user_assoc.id,
+                is_contact_person: data.key_person_registration.set_as_contact_person,
+            });
+        }
     }
 
     if (basic_details && contact_details) {
@@ -418,18 +522,19 @@ exports.checkZipcode = async (zipcode) => {
 
 exports.addLegalAddress = async (data) => {
     const zipcodeData = await db.bt_zipcodes.findOne({ where: { zipcode: data.contact_details.legal_address.zipcode } });
+    const user = await db.User.findOne({ where: { email: data.basic_details.creator_email } });
 
     if (data.contact_details.legal_address.edit_state_county_details === 'N') {
         const address1 = `${data.basic_details.name},${data.contact_details.legal_address.street_no} ${data.contact_details.legal_address.street_name},${zipcodeData.city},${zipcodeData.county},${zipcodeData.zipcode}`;
-        const add_data = {
+        const addr_data = {
             is_active: 'Y',
-            createdBy: data.basic_details.creator,
-            updatedBy: data.basic_details.creator,
+            createdBy: user.fullName,
+            updatedBy: user.fullName,
             zipcodes_id: zipcodeData.id,
             street_no: data.contact_details.legal_address.street_no,
             address1: address1,
         };
-        const contact_details = await db.Business_Address.create(add_data);
+        const contact_details = await db.Business_Address.create(addr_data);
         return contact_details;
     }
 
@@ -437,8 +542,8 @@ exports.addLegalAddress = async (data) => {
         const address1 = `${data.basic_details.name},${data.contact_details.legal_address.street_no} ${data.contact_details.legal_address.street_name},${data.contact_details.legal_address.city},${data.contact_details.legal_address.county},${zipcodeData.zipcode}`;
         const add_data = {
             is_active: 'Y',
-            createdBy: data.basic_details.creator,
-            updatedBy: data.basic_details.creator,
+            createdBy: user.fullName,
+            updatedBy: user.fullName,
             zipcodes_id: zipcodeData.id,
             street_no: data.contact_details.legal_address.street_no,
             address1: address1,
@@ -450,15 +555,16 @@ exports.addLegalAddress = async (data) => {
 
 exports.addBusinessLocation = async (data) => {
     const zipcodeData = await db.bt_zipcodes.findOne({ where: { zipcode: data.contact_details.business_location.zipcode } });
+    const user = await db.User.findOne({ where: { email: data.basic_details.creator_email } });
 
     if (data.contact_details.business_location.edit_state_county_details === 'N') {
         const address1 = `${data.basic_details.name},${data.contact_details.business_location.street_no} ${
-            data.Contact_Details.Business_Location.street_name
+            data.contact_details.business_location.street_name
         },${await zipcodeData.city},${await zipcodeData.county},${await zipcodeData.zipcode}`;
         const loc_data = {
             is_active: 'Y',
-            createdBy: data.basic_details.creator,
-            updatedBy: data.basic_details.creator,
+            createdBy: user.fullName,
+            updatedBy: user.fullName,
             zipcodes_id: zipcodeData.id,
             street_no: data.contact_details.business_location.street_no,
             address1: address1,
@@ -475,8 +581,8 @@ exports.addBusinessLocation = async (data) => {
             .contact_details.business_location.zipcode}`;
         const loc_data = {
             is_active: 'Y',
-            createdBy: data.basic_details.creator,
-            updatedBy: data.basic_details.creator,
+            createdBy: user.fullName,
+            updatedBy: user.fullName,
             zipcodes_id: zipcodeData.id,
             street_no: data.contact_details.business_location.street_no,
             address1: address1,

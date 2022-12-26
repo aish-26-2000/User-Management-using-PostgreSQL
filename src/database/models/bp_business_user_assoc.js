@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
             Business_User_Assoc.belongsTo(model.bp_user_association, { foreignKey: 'user_assoc_id' });
             Business_User_Assoc.belongsTo(model.Business, { foreignKey: 'business_id' });
             Business_User_Assoc.belongsTo(model.User, { foreignKey: 'UserId' });
+            Business_User_Assoc.belongsTo(model.bp_investor_type, { foreignKey: 'investor_type_id' });
         }
     }
     Business_User_Assoc.init(
@@ -45,6 +46,14 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
+            ownership_percent: {
+                type: DataTypes.BIGINT,
+                allowNull: false,
+            },
+            user_assoc_role: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
             UserId: {
                 allowNull: false,
                 type: DataTypes.BIGINT,
@@ -53,9 +62,19 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
                 type: DataTypes.BIGINT,
             },
+            investor_type_id: {
+                type: DataTypes.BIGINT,
+            },
+            investor_type_comment: {
+                type: DataTypes.STRING,
+            },
             user_assoc_id: {
                 allowNull: false,
                 type: DataTypes.BIGINT,
+            },
+            is_contact_person: {
+                type: DataTypes.STRING,
+                defaultValue: 'N',
             },
         },
         {

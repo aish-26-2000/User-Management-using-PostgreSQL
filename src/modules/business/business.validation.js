@@ -20,7 +20,7 @@ const businessSchema = {
             basic_details: {
                 name: Joi.string().trim().min(3).max(50).trim().required(),
                 dba: Joi.string().trim().min(3).max(50).trim().required(),
-                creator: Joi.string().trim().min(3).max(50).trim().required(),
+                creator_email: Joi.string().email().required(),
             },
             cannabis_related_details: {
                 license_type: Joi.string()
@@ -80,16 +80,16 @@ const businessSchema = {
                     phone_type: Joi.string().required().valid('Mobile', 'Landline'),
                 },
                 business_location: {
-                    is_primary_business_location_same_as_Legal_address: Joi.string().valid('Y', 'N').required(),
-                    edit_state_county_details: Joi.when('is_primary_business_location_same_as_Legal_address', {
+                    is_primary_business_location_same_as_legal_address: Joi.string().valid('Y', 'N').required(),
+                    edit_state_county_details: Joi.when('is_primary_business_location_same_as_legal_address', {
                         is: 'N',
                         then: Joi.string().valid('Y', 'N').required(),
                     }),
-                    country: Joi.when('is_primary_business_location_same_as_Legal_address', {
+                    country: Joi.when('is_primary_business_location_same_as_legal_address', {
                         is: 'N',
                         then: Joi.string().valid('United States of America').required(),
                     }),
-                    zipcode: Joi.when('is_primary_business_location_same_as_Legal_address', {
+                    zipcode: Joi.when('is_primary_business_location_same_as_legal_address', {
                         is: 'N',
                         then: Joi.string().trim().max(8).required(),
                     }),
@@ -101,39 +101,61 @@ const businessSchema = {
                         is: 'Y',
                         then: Joi.string().max(20).required(),
                     }),
-                    street_no: Joi.when('is_primary_business_location_same_as_Legal_address', {
+                    street_no: Joi.when('is_primary_business_location_same_as_legal_address', {
                         is: 'N',
                         then: Joi.string().max(5).required(),
                     }),
-                    street_name: Joi.when('is_primary_business_location_same_as_Legal_address', {
+                    street_name: Joi.when('is_primary_business_location_same_as_legal_address', {
                         is: 'N',
                         then: Joi.string().trim().min(3).max(50).trim().required(),
                     }),
-                    phone_number: Joi.when('is_primary_business_location_same_as_Legal_address', {
+                    phone_number: Joi.when('is_primary_business_location_same_as_legal_address', {
                         is: 'N',
                         then: Joi.string().trim().max(12).trim().required(),
                     }),
-                    phone_type: Joi.when('is_primary_business_location_same_as_Legal_address', {
+                    phone_type: Joi.when('is_primary_business_location_same_as_legal_address', {
                         is: 'N',
                         then: Joi.string().required().valid('Mobile', 'Landline'),
                     }),
                 },
             },
             key_person_registration: {
-                edit_details: Joi.string().valid('Y', 'N').required(),
-                name: Joi.when('edit_details', {
+                add_user: Joi.string().valid('Y', 'N').required(),
+                user_type: Joi.when('add_user', {
+                    is: 'Y',
+                    then: Joi.string().valid('Beneficial owner', 'Investor', 'Controlling Managers & Operators').required(),
+                }),
+                name: Joi.when('add_user', {
                     is: 'Y',
                     then: Joi.string().trim().min(3).max(50).trim().required(),
                 }),
-                email: Joi.when('edit_details', {
+                email: Joi.when('add_user', {
                     is: 'Y',
                     then: Joi.string().trim().email().required(),
                 }),
-                user_type: Joi.when('edit_details', {
+                ownership_percentage: Joi.when('add_user', {
                     is: 'Y',
-                    then: Joi.string()
-                        .valid('Beneficial owner', 'Investor', 'Controlling Managers & Operators', 'Registered owner')
-                        .required(),
+                    then: Joi.when('user_type', {
+                        is: 'B',
+                        then: Joi.number().min(20).max(100).required(),
+                    }),
+                }),
+                investor_type: Joi.when('add_user', {
+                    is: 'Y',
+                    then: Joi.when('user_type', {
+                        is: 'C',
+                        then: Joi.string()
+                            .valid('Angel/Individual', 'Fund', 'Friends and Family', 'Venture Capital/Institutional')
+                            .required(),
+                    }),
+                }),
+                access_type: Joi.when('add_user', {
+                    is: 'Y',
+                    then: Joi.string().valid('Admin', 'Advanced', 'Limited', 'No access').required(),
+                }),
+                set_as_contact_person: Joi.when('add_user', {
+                    is: 'Y',
+                    then: Joi.string().valid('Y', 'N'),
                 }),
             },
         }),
@@ -141,10 +163,10 @@ const businessSchema = {
 
     nonCannabisBusiness: {
         body: Joi.object().keys({
-            Basic_Details: {
+            basic_details: {
                 name: Joi.string().trim().min(3).max(50).trim().required(),
                 dba: Joi.string().trim().min(3).max(50).trim().required(),
-                creator: Joi.string().trim().min(3).max(50).trim().required(),
+                creator_email: Joi.string().email().required(),
             },
             contact_details: {
                 legal_address: {
@@ -165,13 +187,13 @@ const businessSchema = {
                     phone_type: Joi.string().required().valid('Mobile', 'Landline'),
                 },
                 business_location: {
-                    is_primary_business_location_same_as_Legal_address: Joi.string().valid('Y', 'N').required(),
+                    is_primary_business_location_same_as_legal_address: Joi.string().valid('Y', 'N').required(),
                     edit_state_county_details: Joi.string().valid('Y', 'N').required(),
-                    country: Joi.when('is_primary_business_location_same_as_Legal_address', {
+                    country: Joi.when('is_primary_business_location_same_as_legal_address', {
                         is: 'N',
                         then: Joi.string().valid('United States of America').required(),
                     }),
-                    zipcode: Joi.when('is_primary_business_location_same_as_Legal_address', {
+                    zipcode: Joi.when('is_primary_business_location_same_as_legal_address', {
                         is: 'N',
                         then: Joi.string().trim().max(8).required(),
                     }),
@@ -183,39 +205,61 @@ const businessSchema = {
                         is: 'Y',
                         then: Joi.string().max(20).required(),
                     }),
-                    street_no: Joi.when('is_primary_business_location_same_as_Legal_address', {
+                    street_no: Joi.when('is_primary_business_location_same_as_legal_address', {
                         is: 'N',
                         then: Joi.string().max(5).required(),
                     }),
-                    street_name: Joi.when('is_primary_business_location_same_as_Legal_address', {
+                    street_name: Joi.when('is_primary_business_location_same_as_legal_address', {
                         is: 'N',
                         then: Joi.string().trim().min(3).max(50).trim().required(),
                     }),
-                    phone_number: Joi.when('is_primary_business_location_same_as_Legal_address', {
+                    phone_number: Joi.when('is_primary_business_location_same_as_legal_address', {
                         is: 'N',
                         then: Joi.string().trim().max(12).trim().required(),
                     }),
-                    phone_type: Joi.when('is_primary_business_location_same_as_Legal_address', {
+                    phone_type: Joi.when('is_primary_business_location_same_as_legal_address', {
                         is: 'N',
                         then: Joi.string().required().valid('Mobile', 'Landline'),
                     }),
                 },
             },
             key_person_registration: {
-                edit_details: Joi.string().valid('Y', 'N').required(),
-                name: Joi.when('edit_details', {
+                add_user: Joi.string().valid('Y', 'N').required(),
+                user_type: Joi.when('add_user', {
+                    is: 'Y',
+                    then: Joi.string().valid('Beneficial owner', 'Investor', 'Controlling Managers & Operators').required(),
+                }),
+                name: Joi.when('add_user', {
                     is: 'Y',
                     then: Joi.string().trim().min(3).max(50).trim().required(),
                 }),
-                email: Joi.when('edit_details', {
+                email: Joi.when('add_user', {
                     is: 'Y',
                     then: Joi.string().trim().email().required(),
                 }),
-                user_type: Joi.when('edit_details', {
+                ownership_percentage: Joi.when('add_user', {
                     is: 'Y',
-                    then: Joi.string()
-                        .valid('Beneficial owner', 'Investor', 'Controlling Managers & Operators', 'Registered owner')
-                        .required(),
+                    then: Joi.when('user_type', {
+                        is: 'B',
+                        then: Joi.number().min(20).max(100).required(),
+                    }),
+                }),
+                investor_type: Joi.when('add_user', {
+                    is: 'Y',
+                    then: Joi.when('user_type', {
+                        is: 'C',
+                        then: Joi.string()
+                            .valid('Angel/Individual', 'Fund', 'Friends and Family', 'Venture Capital/Institutional')
+                            .required(),
+                    }),
+                }),
+                access_type: Joi.when('add_user', {
+                    is: 'Y',
+                    then: Joi.string().valid('Admin', 'Advanced', 'Limited', 'No access').required(),
+                }),
+                set_as_contact_person: Joi.when('add_user', {
+                    is: 'Y',
+                    then: Joi.string().valid('Y', 'N'),
                 }),
             },
         }),
