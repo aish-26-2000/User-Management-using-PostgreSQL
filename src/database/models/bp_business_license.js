@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
         static associate(model) {
             Business_License.belongsTo(model.Business, { foreignKey: 'business_id' });
             Business_License.belongsTo(model.bp_license_type, { foreignKey: 'license_type_id' });
+            Business_License.belongsTo(model.bt_region, { foreignKey: 'bp_license_state_bt_region_id' });
         }
     }
     Business_License.init(
@@ -43,11 +44,17 @@ module.exports = (sequelize, DataTypes) => {
             business_id: {
                 type: DataTypes.BIGINT,
             },
+            license_no: {
+                type: DataTypes.STRING,
+            },
             license_type_id: {
                 type: DataTypes.BIGINT,
             },
             license_type_comment: {
                 type: DataTypes.STRING,
+            },
+            bp_license_state_bt_region_id: {
+                type: DataTypes.BIGINT,
             },
         },
         {
