@@ -1,8 +1,5 @@
 const { responseHelper } = require('../../helpers');
 const {
-    getAllBusiness,
-    addNonCannabisBusiness,
-    addCannabisBusiness,
     allPhoneTypes,
     user_association_types,
     investor_type,
@@ -13,6 +10,10 @@ const {
     license_category,
     entity_type,
     checkZipcode,
+    getEditableBusiness,
+    getAllBusiness,
+    updatePreferences,
+    addBusiness,
 } = require('./business.service');
 
 exports.getAllBusinessList = async (req, res, next) => {
@@ -31,33 +32,33 @@ exports.getAllBusinessList = async (req, res, next) => {
     }
 };
 
-exports.registerCannabisBusiness = async (req, res, next) => {
+exports.getUserEditableBusiness = async (req, res, next) => {
     try {
-        const data = req.body;
+        const { page, size } = req.query;
 
-        const response = await addCannabisBusiness(data);
+        const response = await getEditableBusiness(page, size);
 
         if (!response) {
-            responseHelper.fail(res, 'Error, Business not added.');
+            responseHelper.fail(res, 'Error, Data not found');
         }
 
-        responseHelper.success(res, response, 'Cannabis Business added successfully.');
+        responseHelper.success(res, response, 'User Editable Business List');
     } catch (err) {
         next(err);
     }
 };
 
-exports.registerNonCannabisBusiness = async (req, res, next) => {
+exports.registerBusiness = async (req, res, next) => {
     try {
         const data = req.body;
 
-        const response = await addNonCannabisBusiness(data);
+        const response = await addBusiness(data);
 
         if (!response) {
             responseHelper.fail(res, 'Error, Business not added.');
         }
 
-        responseHelper.success(res, response, 'Non-Cannabis Business added successfully.');
+        responseHelper.success(res, response, 'Business added successfully.');
     } catch (err) {
         next(err);
     }
@@ -211,4 +212,20 @@ exports.findZip = async (req, res, next) => {
     }
 
     next();
+};
+
+exports.updateUserPreferences = async (req, res, next) => {
+    try {
+        const { pref_value, pref_id, user_id } = req.body;
+
+        const response = await updatePreferences(user_id, pref_id, pref_value);
+
+        if (!response) {
+            responseHelper.fail(res, 'Error, Preferences not updated.');
+        }
+
+        responseHelper.success(res, response, 'Preferences updated successfully');
+    } catch (err) {
+        next(err);
+    }
 };

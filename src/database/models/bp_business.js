@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
             Business.hasMany(model.Business_Phone, { foreignKey: 'business_id' });
             Business.hasMany(model.Business_Other_Addr, { foreignKey: 'business_id' });
             Business.belongsTo(model.bt_region, { foreignKey: 'incorp_state_bt_region_id' });
+            Business.hasMany(model.User_Role, { foreignKey: 'business_id' });
         }
     }
     Business.init(

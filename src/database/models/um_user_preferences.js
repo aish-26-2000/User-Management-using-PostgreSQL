@@ -1,25 +1,22 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-    class Business_User_Assoc extends Model {
+    class User_Preference extends Model {
         // Helper method for defining associations.
         // This method is not a part of Sequelize lifecycle.
         // The `models/index` file will call this method automatically.
         static associate(model) {
-            Business_User_Assoc.belongsTo(model.bp_user_association, { foreignKey: 'user_assoc_id' });
-            Business_User_Assoc.belongsTo(model.Business, { foreignKey: 'business_id' });
-            Business_User_Assoc.belongsTo(model.User, { foreignKey: 'UserId' });
-            Business_User_Assoc.belongsTo(model.bp_investor_type, { foreignKey: 'investor_type_id' });
+            User_Preference.belongsTo(model.User, { foreignKey: 'UserId' });
         }
     }
-    Business_User_Assoc.init(
+    User_Preference.init(
         {
-            bp_business_user_assoc_id: {
+            um_user_preferences_id: {
                 allowNull: false,
                 type: DataTypes.UUID,
                 defaultValue: DataTypes.UUIDV4,
             },
-            business_user_assoc_id: {
+            user_preferences_id: {
                 allowNull: false,
                 primaryKey: true,
                 autoIncrement: true,
@@ -42,45 +39,33 @@ module.exports = (sequelize, DataTypes) => {
             updatedBy: {
                 type: DataTypes.STRING,
             },
-            description: {
-                type: DataTypes.STRING,
-                allowNull: false,
-            },
-            ownership_percent: {
-                type: DataTypes.BIGINT,
-                allowNull: false,
-            },
             UserId: {
                 allowNull: false,
                 type: DataTypes.BIGINT,
             },
-            business_id: {
-                allowNull: false,
-                type: DataTypes.BIGINT,
-            },
-            investor_type_id: {
-                type: DataTypes.BIGINT,
-            },
-            investor_type_comment: {
+            pref_name: {
                 type: DataTypes.STRING,
-            },
-            user_assoc_id: {
                 allowNull: false,
-                type: DataTypes.BIGINT,
             },
-            is_contact_person: {
+            pref_key: {
                 type: DataTypes.STRING,
-                defaultValue: 'N',
+                allowNull: false,
+            },
+            pref_value: {
+                type: DataTypes.ARRAY(DataTypes.STRING),
+            },
+            pref_operator: {
+                type: DataTypes.STRING,
             },
         },
         {
             sequelize,
-            modelName: Business_User_Assoc.name,
-            tableName: 'bp_business_user_assoc',
+            modelName: User_Preference.name,
+            tableName: 'um_user_preferences',
             paranoid: true,
             timestamps: true,
         }
     );
 
-    return Business_User_Assoc;
+    return User_Preference;
 };
