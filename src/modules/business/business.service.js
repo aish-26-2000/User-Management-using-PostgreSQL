@@ -305,99 +305,112 @@ exports.addBusiness = async (data) => {
             { transaction: t }
         );
 
+        // add multiple users
         if (data.key_person_registration.add_user === 'Y') {
-            const user = await db.User.findOne({ where: { email: data.key_person_registration.email } });
-            const user_assoc = await db.bp_user_association.findOne({
-                where: { bp_user_association_id: data.key_person_registration.user_type },
+            const user_arr = data.key_person_registration.users;
+            // console.log(user_arr);
+            user_arr.forEach(async (ele) => {
+                const t = await sequelize.transaction();
+                try {
+                    const user = await db.User.findOne({ where: { email: ele.email } });
+                    const user_assoc = await db.bp_user_association.findOne({
+                        where: { bp_user_association_id: ele.user_type },
+                    });
+                    const user_role = await db.Roles.findOne({ where: { um_role_id: ele.access_type } });
+
+                    if (ele.user_type === '7cf77242-181c-45a2-94a5-2728974e8805') {
+                        await db.Business_User_Assoc.create(
+                            {
+                                is_active: 'Y',
+                                createdBy: user.fullName,
+                                updatedBy: user.fullName,
+                                description: 'Beneficial owner',
+                                ownership_percent: ele.ownership_percentage,
+                                UserId: user.UserId,
+                                business_id: basic_details.business_id,
+                                user_assoc_id: user_assoc.id,
+                                is_contact_person: ele.set_as_contact_person,
+                            },
+                            { transaction: t }
+                        );
+                        await db.User_Role.create(
+                            {
+                                um_user_role_id: crypto.randomUUID(),
+                                is_active: 'Y',
+                                created: new Date(),
+                                updated: new Date(),
+                                createdby: user.fullName,
+                                updatedby: user.fullName,
+                                role_comment: user_role.name,
+                                role_id: user_role.id,
+                                user_id: user.UserId,
+                                business_id: basic_details.business_id,
+                            },
+                            { transaction: t }
+                        );
+                    }
+
+                    if (ele.user_type === 'ca51143d-9486-478b-a1cd-8051d682b7e0') {
+                        await db.Business_User_Assoc.create(
+                            {
+                                is_active: 'Y',
+                                createdBy: user.fullName,
+                                updatedBy: user.fullName,
+                                description: 'Controlling Managers & Operators',
+                                ownership_percent: 0,
+                                UserId: user.UserId,
+                                business_id: basic_details.business_id,
+                                user_assoc_id: user_assoc.id,
+                                is_contact_person: ele.set_as_contact_person,
+                            },
+                            { transaction: t }
+                        );
+                        await db.User_Role.create(
+                            {
+                                um_user_role_id: crypto.randomUUID(),
+                                is_active: 'Y',
+                                created: new Date(),
+                                updated: new Date(),
+                                createdby: user.fullName,
+                                updatedby: user.fullName,
+                                role_comment: user_role.name,
+                                role_id: user_role.id,
+                                user_id: user.UserId,
+                                business_id: basic_details.business_id,
+                            },
+                            { transaction: t }
+                        );
+                    }
+
+                    if (ele.user_type === 'f63eda23-26fc-4594-b398-813c82f3e33b') {
+                        const investor_type = await db.bp_investor_type.findOne({
+                            where: { bp_investor_type_id: ele.investor_type },
+                        });
+                        await db.Business_User_Assoc.create(
+                            {
+                                is_active: 'Y',
+                                createdBy: user.fullName,
+                                updatedBy: user.fullName,
+                                description: 'Investor',
+                                ownership_percent: 0,
+                                UserId: user.UserId,
+                                business_id: basic_details.business_id,
+                                investor_type_id: investor_type.id,
+                                user_assoc_id: user_assoc.id,
+                                is_contact_person: ele.set_as_contact_person,
+                            },
+                            { transaction: t }
+                        );
+                    }
+                    await t.commit();
+                } catch (err) {
+                    await t.rollback();
+                    throw err;
+                }
             });
-            const user_role = await db.Roles.findOne({ where: { um_role_id: data.key_person_registration.access_type } });
-
-            if (data.key_person_registration.user_type === '7cf77242-181c-45a2-94a5-2728974e8805') {
-                await db.Business_User_Assoc.create(
-                    {
-                        is_active: 'Y',
-                        createdBy: user.fullName,
-                        updatedBy: user.fullName,
-                        description: 'Beneficial owner',
-                        ownership_percent: data.key_person_registration.ownership_percentage,
-                        UserId: user.UserId,
-                        business_id: basic_details.business_id,
-                        user_assoc_id: user_assoc.id,
-                        is_contact_person: data.key_person_registration.set_as_contact_person,
-                    },
-                    { transaction: t }
-                );
-                await db.User_Role.create(
-                    {
-                        um_user_role_id: crypto.randomUUID(),
-                        is_active: 'Y',
-                        created: new Date(),
-                        updated: new Date(),
-                        createdby: user.fullName,
-                        updatedby: user.fullName,
-                        role_comment: user_role.name,
-                        role_id: user_role.id,
-                        user_id: user.UserId,
-                        business_id: basic_details.business_id,
-                    },
-                    { transaction: t }
-                );
-            }
-
-            if (data.key_person_registration.user_type === 'ca51143d-9486-478b-a1cd-8051d682b7e0') {
-                await db.Business_User_Assoc.create(
-                    {
-                        is_active: 'Y',
-                        createdBy: user.fullName,
-                        updatedBy: user.fullName,
-                        description: 'Controlling Managers & Operators',
-                        ownership_percent: 0,
-                        UserId: user.UserId,
-                        business_id: basic_details.business_id,
-                        user_assoc_id: user_assoc.id,
-                        is_contact_person: data.key_person_registration.set_as_contact_person,
-                    },
-                    { transaction: t }
-                );
-                await db.User_Role.create(
-                    {
-                        um_user_role_id: crypto.randomUUID(),
-                        is_active: 'Y',
-                        created: new Date(),
-                        updated: new Date(),
-                        createdby: user.fullName,
-                        updatedby: user.fullName,
-                        role_comment: user_role.name,
-                        role_id: user_role.id,
-                        user_id: user.UserId,
-                        business_id: basic_details.business_id,
-                    },
-                    { transaction: t }
-                );
-            }
-
-            if (data.key_person_registration.user_type === 'f63eda23-26fc-4594-b398-813c82f3e33b') {
-                const investor_type = await db.bp_investor_type.findOne({
-                    where: { bp_investor_type_id: data.key_person_registration.investor_type },
-                });
-                await db.Business_User_Assoc.create(
-                    {
-                        is_active: 'Y',
-                        createdBy: user.fullName,
-                        updatedBy: user.fullName,
-                        description: 'Investor',
-                        ownership_percent: 0,
-                        UserId: user.UserId,
-                        business_id: basic_details.business_id,
-                        investor_type_id: investor_type.id,
-                        user_assoc_id: user_assoc.id,
-                        is_contact_person: data.key_person_registration.set_as_contact_person,
-                    },
-                    { transaction: t }
-                );
-            }
         }
 
+        // create status
         await db.Business_Stage_Status.create(
             {
                 createdBy: user.fullName,

@@ -330,61 +330,47 @@ const businessSchema = {
             },
             key_person_registration: {
                 add_user: Joi.string().valid('Y', 'N').required(),
-                user_type: Joi.when('add_user', {
+                users: Joi.when('add_user', {
                     is: 'Y',
-                    then: Joi.string()
-                        .uuid()
-                        .valid(
-                            '7cf77242-181c-45a2-94a5-2728974e8805', // beneficial owner
-                            'f63eda23-26fc-4594-b398-813c82f3e33b', // investor
-                            'ca51143d-9486-478b-a1cd-8051d682b7e0' // controlling managers
-                        )
-                        .required(),
-                }),
-                name: Joi.when('add_user', {
-                    is: 'Y',
-                    then: Joi.string().trim().min(3).max(50).trim().required(),
-                }),
-                email: Joi.when('add_user', {
-                    is: 'Y',
-                    then: Joi.string().trim().email().required(),
-                }),
-                ownership_percentage: Joi.when('add_user', {
-                    is: 'Y',
-                    then: Joi.when('user_type', {
-                        is: '7cf77242-181c-45a2-94a5-2728974e8805',
-                        then: Joi.number().min(20).max(100).required(),
-                    }),
-                }),
-                investor_type: Joi.when('add_user', {
-                    is: 'Y',
-                    then: Joi.when('user_type', {
-                        is: 'f63eda23-26fc-4594-b398-813c82f3e33b',
-                        then: Joi.string()
-                            .uuid()
-                            .valid(
-                                '8c9783b7-614c-4447-9178-cb4f3165da5b',
-                                'f3bacea4-41a4-4873-ae42-b8089d3956a0',
-                                '919a3f56-77e5-4691-80fc-bfe1ab9a90b4',
-                                '3fe33de6-a9b2-46a7-8571-9a633820840e'
-                            )
-                            .required(),
-                    }),
-                }),
-                access_type: Joi.when('add_user', {
-                    is: 'Y',
-                    then: Joi.string()
-                        .valid(
-                            'd169c927-034d-4e74-997a-50f4fee899ba', // admin
-                            '0cbd8cd0-5925-4968-b4d3-4bc538254d70', // advanced
-                            'c6b1ff96-9ee5-4dec-a87f-432abe5b91e0', // limited
-                            'c5ee4167-630c-40e4-9ec9-1e7c4bb4965b' // no access
-                        )
-                        .required(),
-                }),
-                set_as_contact_person: Joi.when('add_user', {
-                    is: 'Y',
-                    then: Joi.string().valid('Y', 'N'),
+                    then: Joi.array().items(
+                        Joi.object({
+                            user_type: Joi.string()
+                                .uuid()
+                                .valid(
+                                    '7cf77242-181c-45a2-94a5-2728974e8805', // beneficial owner
+                                    'f63eda23-26fc-4594-b398-813c82f3e33b', // investor
+                                    'ca51143d-9486-478b-a1cd-8051d682b7e0' // controlling managers
+                                )
+                                .required(),
+                            name: Joi.string().trim().min(3).max(50).trim().required(),
+                            email: Joi.string().trim().email().required(),
+                            ownership_percentage: Joi.when('user_type', {
+                                is: '7cf77242-181c-45a2-94a5-2728974e8805',
+                                then: Joi.number().min(20).max(100).required(),
+                            }),
+                            investor_type: Joi.when('user_type', {
+                                is: 'f63eda23-26fc-4594-b398-813c82f3e33b',
+                                then: Joi.string()
+                                    .uuid()
+                                    .valid(
+                                        '8c9783b7-614c-4447-9178-cb4f3165da5b', // angel/individual
+                                        'f3bacea4-41a4-4873-ae42-b8089d3956a0', // fund
+                                        '919a3f56-77e5-4691-80fc-bfe1ab9a90b4', // friends and family
+                                        '3fe33de6-a9b2-46a7-8571-9a633820840e' // venture capital
+                                    )
+                                    .required(),
+                            }),
+                            access_type: Joi.string()
+                                .valid(
+                                    'd169c927-034d-4e74-997a-50f4fee899ba', // admin
+                                    '0cbd8cd0-5925-4968-b4d3-4bc538254d70', // advanced
+                                    'c6b1ff96-9ee5-4dec-a87f-432abe5b91e0', // limited
+                                    'c5ee4167-630c-40e4-9ec9-1e7c4bb4965b' // no access
+                                )
+                                .required(),
+                            set_as_contact_person: Joi.string().valid('Y', 'N'),
+                        })
+                    ),
                 }),
             },
         }),
