@@ -7,10 +7,11 @@ module.exports = (sequelize, DataTypes) => {
          * This method is not a part of Sequelize lifecycle.
          * The `models/index` file will call this method automatically.
          */
-        // static associate(models) {
-        // define association here
-        // bt_region.belongsTo(models.bt_country, { foreignKey: 'bt_country_id' });
-        // }
+        static associate(models) {
+            // define association here
+            bt_region.hasMany(models.Business, { foreignKey: 'incorp_state_bt_region_id' });
+            bt_region.hasMany(models.Business_License, { foreignKey: 'bp_license_state_bt_region_id' });
+        }
     }
     bt_region.init(
         {

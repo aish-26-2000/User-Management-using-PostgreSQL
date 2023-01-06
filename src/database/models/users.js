@@ -11,6 +11,9 @@ module.exports = (sequelize, DataTypes) => {
             User.hasMany(model.userActivity, { foreignKey: 'UserId' });
             User.hasMany(model.user_consent, { foreignKey: 'UserId' });
             User.hasMany(model.user_cred, { foreignKey: 'UserId' });
+            User.hasMany(model.Business_User_Assoc, { foreignKey: 'UserId' });
+            User.hasMany(model.User_Preference, { foreignKey: 'UserId' });
+            User.hasMany(model.User_Role, { foreignKey: 'user_id' });
         }
     }
     User.init(
@@ -33,9 +36,6 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.VIRTUAL,
                 get() {
                     return `${this.firstName} ${this.lastName}`;
-                },
-                set() {
-                    throw new Error('Do not try to set the `fullName` value!');
                 },
             },
             email: {

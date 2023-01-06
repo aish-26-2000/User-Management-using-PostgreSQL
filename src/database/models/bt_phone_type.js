@@ -7,6 +7,9 @@ module.exports = (sequelize, DataTypes) => {
          * This method is not a part of Sequelize lifecycle.
          * The `models/index` file will call this method automatically.
          */
+        static associate(model) {
+            bt_phone_type.hasMany(model.Business_Phone, { foreignKey: 'phone_type_id' });
+        }
     }
     bt_phone_type.init(
         {

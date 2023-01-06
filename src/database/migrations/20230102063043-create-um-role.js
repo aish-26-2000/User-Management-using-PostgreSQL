@@ -2,24 +2,21 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await queryInterface.createTable('bp_license_type', {
-            license_type_id: {
+        await queryInterface.createTable('um_role', {
+            id: {
                 allowNull: false,
                 autoIncrement: true,
                 primaryKey: true,
                 type: Sequelize.INTEGER,
             },
-            bp_license_type_id: {
+            um_role_id: {
                 type: Sequelize.UUID,
-                unique: true,
+                allowNull: false,
             },
-            isactive: {
+            is_active: {
                 type: Sequelize.STRING,
             },
             name: {
-                type: Sequelize.STRING,
-            },
-            description: {
                 type: Sequelize.STRING,
             },
             created: {
@@ -34,21 +31,9 @@ module.exports = {
             updatedby: {
                 type: Sequelize.STRING,
             },
-            shortcode: {
-                type: Sequelize.STRING,
-            },
-            sequenceno: {
-                type: Sequelize.INTEGER,
-            },
-            is_accredited: {
-                type: Sequelize.STRING,
-            },
-            keyword: {
-                type: Sequelize.STRING,
-            },
         });
     },
     async down(queryInterface) {
-        await queryInterface.dropTable('bp_license_type');
+        await queryInterface.dropTable('um_role');
     },
 };

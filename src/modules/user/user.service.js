@@ -93,7 +93,9 @@ exports.login = async (email, password) => {
 
     if (userAttempts > maxNumberOfFailedLogins) throw new MaxRequestsException(MESSAGES.USER.LOGIN.MAX_ATTEMPTS);
 
-    const passChangeInterval = moment(user.pass_changetime).fromNow().slice(0, 2); // this.calculateDateInterval(user.pass_changetime);
+    const passChangeInterval = moment()
+        .fromNow(await user.pass_changetime)
+        .slice(0, 2); // this.calculateDateInterval(user.pass_changetime);
 
     if (passChangeInterval > 7) {
         return 'password expired';
@@ -177,4 +179,9 @@ exports.calculateDateInterval = (date) => {
     const diff = current_date - pass_changedAt;
     console.log(diff / oneday);
     return diff / oneday;
+};
+
+exports.getCurrentUser = async (decoded) => {
+    const user = await db.User.findOne({ where: { email: decoded.email.email } });
+    if (user) return user;
 };
