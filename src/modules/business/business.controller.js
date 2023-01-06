@@ -14,6 +14,7 @@ const {
     getAllBusiness,
     updatePreferences,
     addBusiness,
+    findBusiness,
 } = require('./business.service');
 
 exports.getAllBusinessList = async (req, res, next) => {
@@ -35,8 +36,9 @@ exports.getAllBusinessList = async (req, res, next) => {
 exports.getUserEditableBusiness = async (req, res, next) => {
     try {
         const { page, size } = req.query;
+        const token = req.headers.authorization.split(' ')[1];
 
-        const response = await getEditableBusiness(page, size);
+        const response = await getEditableBusiness(page, size, token);
 
         if (!response) {
             responseHelper.fail(res, 'Error, Data not found');
@@ -48,11 +50,27 @@ exports.getUserEditableBusiness = async (req, res, next) => {
     }
 };
 
+exports.getBusinessDetails = async (req, res, next) => {
+    try {
+        const id = req.params.id;
+
+        const business = await findBusiness(id);
+        if (!business) {
+            responseHelper.fail(res, 'Error, Business not found');
+        }
+
+        responseHelper.success(res, business, 'Success');
+    } catch (err) {
+        next(err);
+    }
+};
+
 exports.registerBusiness = async (req, res, next) => {
     try {
+        const token = req.headers.authorization.split(' ')[1];
         const data = req.body;
 
-        const response = await addBusiness(data);
+        const response = await addBusiness(data, token);
 
         if (!response) {
             responseHelper.fail(res, 'Error, Business not added.');
@@ -60,6 +78,7 @@ exports.registerBusiness = async (req, res, next) => {
 
         responseHelper.success(res, response, 'Business added successfully.');
     } catch (err) {
+        console.log(err);
         next(err);
     }
 };

@@ -1,5 +1,5 @@
 const { responseHelper } = require('../helpers');
-const { PreconditionException } = require('../helpers/errorResponse');
+const { UnHandledException } = require('../helpers/errorResponse');
 
 const options = {
     basic: {
@@ -18,13 +18,13 @@ module.exports = (schema) => (req, res, next) => {
             const { error } = schema[key].validate(req[key], options);
             if (error) {
                 const message = error.details[0].message || 'Invalid Inputs';
-                throw new PreconditionException(message);
+                // throw new PreconditionException(message);
+                responseHelper.fail(res, message);
             }
         });
 
         next();
     } catch (error) {
-        // throw new UnHandledException(error);
-        next(responseHelper.fail(res, `${error}`));
+        throw new UnHandledException(error);
     }
 };

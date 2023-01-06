@@ -1,5 +1,6 @@
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
+
 module.exports = {
     async up(queryInterface, Sequelize) {
         await queryInterface.createTable('um_user_role', {
@@ -11,6 +12,8 @@ module.exports = {
             },
             um_user_role_id: {
                 type: Sequelize.UUID,
+                defaultValue: Sequelize.UUIDV4,
+                allowNull: false,
             },
             is_active: {
                 type: Sequelize.STRING,

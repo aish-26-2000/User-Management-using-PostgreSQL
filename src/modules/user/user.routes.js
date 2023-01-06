@@ -36,7 +36,7 @@ router.post('/login', validationMiddleware(userSchema.login), userController.log
 router.post('/forgotpassword', validationMiddleware(userSchema.forgotPassword), userController.forgotPassword);
 router.patch('/resetpassword/:resetToken', validationMiddleware(userSchema.resetPassword), userController.resetPassword);
 
-router.use('/changepassword/:resetToken', testPasswordStrength);
+// router.use('/changepassword/:resetToken', testPasswordStrength);
 router.post('/changepassword/:resetToken', validationMiddleware(userSchema.changePassword), userController.changePassword);
 
 router.post('/consent', updateUserConsent);

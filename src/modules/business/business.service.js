@@ -1,9 +1,10 @@
-const crypto = require('crypto');
+const { decode } = require('jsonwebtoken');
 const { sequelize } = require('../../database/models');
 const db = require('../../database/models');
+const { getCurrentUser } = require('../user/user.service');
 const Op = db.Sequelize.Op;
 
-exports.getEditableBusiness = async (page, size) => {
+exports.getEditableBusiness = async (page, size, token) => {
     const Pagination = (page, size) => {
         const limit = size ? +size : 3;
         const offset = page ? page * limit : 0;
@@ -17,8 +18,11 @@ exports.getEditableBusiness = async (page, size) => {
     };
 
     const { limit, offset } = Pagination(page, size);
+    const currentUser = decode(token);
+    const user = await getCurrentUser(currentUser);
     const list = await db.Business.findAndCountAll({
-        attributes: ['bp_business_id', 'name', 'dba', 'is_active'],
+        where: { createdBy: user.fullName },
+        attributes: ['bp_business_id', 'name', 'dba', 'is_active', 'is_cannabis_business'],
         limit,
         offset,
     });
@@ -44,25 +48,13 @@ exports.getAllBusiness = async (page, size, sort_column, sort_order, filterby, q
 
     if (filterby === 'Cannabis Business') {
         const business = await db.Business.findAndCountAll({
-            attributes: [
-                'business_id',
-                'bp_business_id',
-                'name',
-                'dba',
-                'bp_group_shortcode',
-                'createdAt',
-                'is_approved',
-                'is_approved_vendor',
-                'is_cannabis_business',
-                'is_createdby_stdc',
-            ],
+            attributes: ['bp_business_id', 'name', 'dba', 'createdAt', 'is_cannabis_business', 'is_createdby_stdc'],
             where: {
                 [Op.and]: [
                     { is_cannabis_business: 'Y' },
                     { [Op.or]: [{ name: { [Op.like]: '%' + query + '%' } }, { dba: { [Op.like]: '%' + query + '%' } }] },
                 ],
             },
-            include: [{ model: db.Business_Stage_Status, attributes: ['bp_onboard_stage_status_id', 'stage', 'status'] }],
             order: [[sort_column || 'business_id', sort_order || 'ASC']],
             limit,
             offset,
@@ -74,25 +66,13 @@ exports.getAllBusiness = async (page, size, sort_column, sort_order, filterby, q
 
     if (filterby === 'Non-Cannabis Business') {
         const business = await db.Business.findAndCountAll({
-            attributes: [
-                'business_id',
-                'bp_business_id',
-                'name',
-                'dba',
-                'bp_group_shortcode',
-                'createdAt',
-                'is_approved',
-                'is_approved_vendor',
-                'is_cannabis_business',
-                'is_createdby_stdc',
-            ],
+            attributes: ['bp_business_id', 'name', 'dba', 'createdAt', 'is_cannabis_business', 'is_createdby_stdc'],
             where: {
                 [Op.and]: [
                     { is_cannabis_business: 'N' },
                     { [Op.or]: [{ name: { [Op.like]: '%' + query + '%' } }, { dba: { [Op.like]: '%' + query + '%' } }] },
                 ],
             },
-            include: [{ model: db.Business_Stage_Status, attributes: ['bp_onboard_stage_status_id', 'stage', 'status'] }],
             order: [[sort_column || 'business_id', sort_order || 'ASC']],
             limit,
             offset,
@@ -104,25 +84,13 @@ exports.getAllBusiness = async (page, size, sort_column, sort_order, filterby, q
 
     if (filterby === 'Approved Vendor') {
         const business = await db.Business.findAndCountAll({
-            attributes: [
-                'business_id',
-                'bp_business_id',
-                'name',
-                'dba',
-                'bp_group_shortcode',
-                'createdAt',
-                'is_approved',
-                'is_approved_vendor',
-                'is_cannabis_business',
-                'is_createdby_stdc',
-            ],
+            attributes: ['bp_business_id', 'name', 'dba', 'createdAt', 'is_cannabis_business', 'is_createdby_stdc'],
             where: {
                 [Op.and]: [
                     { is_approved_vendor: 'Y' },
                     { [Op.or]: [{ name: { [Op.like]: '%' + query + '%' } }, { dba: { [Op.like]: '%' + query + '%' } }] },
                 ],
             },
-            include: [{ model: db.Business_Stage_Status, attributes: ['bp_onboard_stage_status_id', 'stage', 'status'] }],
             order: [[sort_column || 'business_id', sort_order || 'ASC']],
             limit,
             offset,
@@ -134,25 +102,13 @@ exports.getAllBusiness = async (page, size, sort_column, sort_order, filterby, q
 
     if (filterby === 'Member Banks') {
         const business = await db.Business.findAndCountAll({
-            attributes: [
-                'business_id',
-                'bp_business_id',
-                'name',
-                'dba',
-                'bp_group_shortcode',
-                'createdAt',
-                'is_approved',
-                'is_approved_vendor',
-                'is_cannabis_business',
-                'is_createdby_stdc',
-            ],
+            attributes: ['bp_business_id', 'name', 'dba', 'createdAt', 'is_cannabis_business', 'is_createdby_stdc'],
             where: {
                 [Op.and]: [
                     { bp_group_shortcode: 'MEMFI' },
                     { [Op.or]: [{ name: { [Op.like]: '%' + query + '%' } }, { dba: { [Op.like]: '%' + query + '%' } }] },
                 ],
             },
-            include: [{ model: db.Business_Stage_Status, attributes: ['bp_onboard_stage_status_id', 'stage', 'status'] }],
             order: [[sort_column || 'business_id', sort_order || 'ASC']],
             limit,
             offset,
@@ -163,22 +119,10 @@ exports.getAllBusiness = async (page, size, sort_column, sort_order, filterby, q
     }
 
     const business = await db.Business.findAndCountAll({
-        attributes: [
-            'business_id',
-            'bp_business_id',
-            'name',
-            'dba',
-            'bp_group_shortcode',
-            'createdAt',
-            'is_approved',
-            'is_approved_vendor',
-            'is_cannabis_business',
-            'is_createdby_stdc',
-        ],
+        attributes: ['bp_business_id', 'name', 'dba', 'createdAt', 'is_cannabis_business', 'is_createdby_stdc'],
         where: {
             [Op.or]: [{ name: { [Op.like]: '%' + query + '%' } }, { dba: { [Op.like]: '%' + query + '%' } }],
         },
-        include: [{ model: db.Business_Stage_Status, attributes: ['bp_onboard_stage_status_id', 'stage', 'status'] }],
         order: [[sort_column || 'business_id', sort_order || 'ASC']],
         limit,
         offset,
@@ -188,12 +132,38 @@ exports.getAllBusiness = async (page, size, sort_column, sort_order, filterby, q
     if (response) return response;
 };
 
-exports.addBusiness = async (data) => {
+exports.findBusiness = async (id) => {
+    const business = await db.Business.findOne({
+        where: { bp_business_id: id },
+        attributes: [
+            'bp_business_id',
+            'is_active',
+            'name',
+            'dba',
+            'bp_group_shortcode',
+            'createdAt',
+            'is_approved',
+            'is_approved_vendor',
+            'is_cannabis_business',
+            'is_createdby_stdc',
+        ],
+        include: [
+            { model: db.Business_Stage_Status, attributes: ['bp_onboard_stage_status_id', 'stage', 'status'] },
+            { model: db.Business_License, attributes: ['bp_business_license_id', 'license_no'] },
+            { model: db.Business_User_Assoc, attributes: ['bp_business_user_assoc_id', 'is_active'] },
+        ],
+    });
+
+    if (business) return business;
+};
+
+exports.addBusiness = async (data, accessToken) => {
     // unmanaged transaction
     const t = await sequelize.transaction();
 
     try {
-        const user = await db.User.findOne({ where: { email: data.basic_details.creator_email } });
+        const currentUser = decode(accessToken);
+        const user = await getCurrentUser(currentUser);
         const region = await db.bt_region.findOne({ where: { bt_region_id: data.basic_details.state } });
         // basic details
         const basic_data = {
@@ -227,7 +197,7 @@ exports.addBusiness = async (data) => {
 
         // contact details
         // legal address
-        const contact_details = await this.addLegalAddress(data, t);
+        const contact_details = await this.addLegalAddress(data, user, t);
 
         const phone_type = await db.bt_phone_type.findOne({ where: { bt_phonetype_id: data.contact_details.legal_address.phone_type } });
         await db.Business_Phone.create(
@@ -244,7 +214,7 @@ exports.addBusiness = async (data) => {
 
         // business location
         if (data.contact_details.business_location.is_primary_business_location_same_as_legal_address === 'N') {
-            const business_loc = await this.addBusinessLocation(data, t);
+            const business_loc = await this.addBusinessLocation(data, user, t);
 
             const phone_type = await db.bt_phone_type.findOne({
                 where: { bt_phonetype_id: data.contact_details.legal_address.phone_type },
@@ -291,12 +261,9 @@ exports.addBusiness = async (data) => {
         );
         await db.User_Role.create(
             {
-                um_user_role_id: crypto.randomUUID(),
                 is_active: 'Y',
-                created: new Date(),
-                updated: new Date(),
-                createdby: user.fullName,
-                updatedby: user.fullName,
+                createdBy: user.fullName,
+                updatedBy: user.fullName,
                 role_comment: 'Admin',
                 role_id: 1,
                 user_id: user.UserId,
@@ -307,107 +274,83 @@ exports.addBusiness = async (data) => {
 
         // add multiple users
         if (data.key_person_registration.add_user === 'Y') {
-            const user_arr = data.key_person_registration.users;
-            // console.log(user_arr);
-            user_arr.forEach(async (ele) => {
-                const t = await sequelize.transaction();
-                try {
-                    const user = await db.User.findOne({ where: { email: ele.email } });
-                    const user_assoc = await db.bp_user_association.findOne({
-                        where: { bp_user_association_id: ele.user_type },
+            const arr = data.key_person_registration.users;
+            const user_assoc_arr = [];
+            const user_role_arr = [];
+
+            for (const ele of arr) {
+                const user_assoc = await db.bp_user_association.findOne({
+                    where: { bp_user_association_id: ele.user_type },
+                });
+                const this_user = await db.User.findOne({ where: { email: ele.email } });
+                // beneficial owner
+                if (user_assoc.shortcode === 'BIN') {
+                    user_assoc_arr.push({
+                        is_active: 'Y',
+                        createdBy: user.fullName,
+                        updatedBy: user.fullName,
+                        description: 'Beneficial owner',
+                        ownership_percent: ele.ownership_percentage,
+                        UserId: this_user.UserId,
+                        business_id: basic_details.business_id,
+                        user_assoc_id: user_assoc.id,
+                        is_contact_person: ele.set_as_contact_person,
                     });
-                    const user_role = await db.Roles.findOne({ where: { um_role_id: ele.access_type } });
-
-                    if (ele.user_type === '7cf77242-181c-45a2-94a5-2728974e8805') {
-                        await db.Business_User_Assoc.create(
-                            {
-                                is_active: 'Y',
-                                createdBy: user.fullName,
-                                updatedBy: user.fullName,
-                                description: 'Beneficial owner',
-                                ownership_percent: ele.ownership_percentage,
-                                UserId: user.UserId,
-                                business_id: basic_details.business_id,
-                                user_assoc_id: user_assoc.id,
-                                is_contact_person: ele.set_as_contact_person,
-                            },
-                            { transaction: t }
-                        );
-                        await db.User_Role.create(
-                            {
-                                um_user_role_id: crypto.randomUUID(),
-                                is_active: 'Y',
-                                created: new Date(),
-                                updated: new Date(),
-                                createdby: user.fullName,
-                                updatedby: user.fullName,
-                                role_comment: user_role.name,
-                                role_id: user_role.id,
-                                user_id: user.UserId,
-                                business_id: basic_details.business_id,
-                            },
-                            { transaction: t }
-                        );
-                    }
-
-                    if (ele.user_type === 'ca51143d-9486-478b-a1cd-8051d682b7e0') {
-                        await db.Business_User_Assoc.create(
-                            {
-                                is_active: 'Y',
-                                createdBy: user.fullName,
-                                updatedBy: user.fullName,
-                                description: 'Controlling Managers & Operators',
-                                ownership_percent: 0,
-                                UserId: user.UserId,
-                                business_id: basic_details.business_id,
-                                user_assoc_id: user_assoc.id,
-                                is_contact_person: ele.set_as_contact_person,
-                            },
-                            { transaction: t }
-                        );
-                        await db.User_Role.create(
-                            {
-                                um_user_role_id: crypto.randomUUID(),
-                                is_active: 'Y',
-                                created: new Date(),
-                                updated: new Date(),
-                                createdby: user.fullName,
-                                updatedby: user.fullName,
-                                role_comment: user_role.name,
-                                role_id: user_role.id,
-                                user_id: user.UserId,
-                                business_id: basic_details.business_id,
-                            },
-                            { transaction: t }
-                        );
-                    }
-
-                    if (ele.user_type === 'f63eda23-26fc-4594-b398-813c82f3e33b') {
-                        const investor_type = await db.bp_investor_type.findOne({
-                            where: { bp_investor_type_id: ele.investor_type },
-                        });
-                        await db.Business_User_Assoc.create(
-                            {
-                                is_active: 'Y',
-                                createdBy: user.fullName,
-                                updatedBy: user.fullName,
-                                description: 'Investor',
-                                ownership_percent: 0,
-                                UserId: user.UserId,
-                                business_id: basic_details.business_id,
-                                investor_type_id: investor_type.id,
-                                user_assoc_id: user_assoc.id,
-                                is_contact_person: ele.set_as_contact_person,
-                            },
-                            { transaction: t }
-                        );
-                    }
-                    await t.commit();
-                } catch (err) {
-                    await t.rollback();
-                    throw err;
                 }
-            });
+                // investor
+                if (user_assoc.shortcode === 'INV') {
+                    const investor_type = await db.bp_investor_type.findOne({
+                        where: { bp_investor_type_id: ele.investor_type },
+                    });
+                    user_assoc_arr.push({
+                        is_active: 'Y',
+                        createdBy: user.fullName,
+                        updatedBy: user.fullName,
+                        description: 'Investor',
+                        ownership_percent: 0,
+                        UserId: this_user.UserId,
+                        business_id: basic_details.business_id,
+                        investor_type_id: investor_type.id,
+                        user_assoc_id: user_assoc.id,
+                        is_contact_person: ele.set_as_contact_person,
+                    });
+                }
+                // controlling managers and operations
+                if (user_assoc.shortcode === 'CMO') {
+                    user_assoc_arr.push({
+                        is_active: 'Y',
+                        createdBy: user.fullName,
+                        updatedBy: user.fullName,
+                        description: 'Controlling Managers & Operators',
+                        ownership_percent: 0,
+                        UserId: this_user.UserId,
+                        business_id: basic_details.business_id,
+                        user_assoc_id: user_assoc.id,
+                        is_contact_person: ele.set_as_contact_person,
+                    });
+                }
+            }
+
+            for (const ele of arr) {
+                const user_role = await db.Roles.findOne({ where: { um_role_id: ele.access_type } });
+                user_role_arr.push({
+                    is_active: 'Y',
+                    created: new Date(),
+                    updated: new Date(),
+                    createdBy: user.fullName,
+                    updatedBy: user.fullName,
+                    role_comment: user_role.name,
+                    role_id: user_role.id,
+                    user_id: user.UserId,
+                    business_id: basic_details.business_id,
+                });
+            }
+
+            console.log(user_role_arr, user_assoc_arr);
+
+            // bulk addition
+            await db.Business_User_Assoc.bulkCreate(user_assoc_arr, { transaction: t });
+            await db.User_Role.bulkCreate(user_role_arr, { transaction: t });
         }
 
         // create status
@@ -509,9 +452,9 @@ exports.checkZipcode = async (zipcode) => {
     }
 };
 
-exports.addLegalAddress = async (data, t) => {
+exports.addLegalAddress = async (data, currentUser, t) => {
     const zipcodeData = await db.bt_zipcodes.findOne({ where: { bt_zipcodes_id: data.contact_details.legal_address.zipcode } });
-    const user = await db.User.findOne({ where: { email: data.basic_details.creator_email } });
+    const user = await db.User.findOne({ where: { email: currentUser.email } });
 
     if (data.contact_details.legal_address.edit_state_county_details === 'N') {
         const address1 = `${data.basic_details.name},${data.contact_details.legal_address.street_no} ${data.contact_details.legal_address.street_name},${zipcodeData.city},${zipcodeData.county},${zipcodeData.zipcode}`;
@@ -542,9 +485,9 @@ exports.addLegalAddress = async (data, t) => {
     }
 };
 
-exports.addBusinessLocation = async (data, t) => {
+exports.addBusinessLocation = async (data, currentUser, t) => {
     const zipcodeData = await db.bt_zipcodes.findOne({ where: { bt_zipcodes_id: data.contact_details.business_location.zipcode } });
-    const user = await db.User.findOne({ where: { email: data.basic_details.creator_email } });
+    const user = await db.User.findOne({ where: { email: currentUser.email } });
 
     if (data.contact_details.business_location.edit_state_county_details === 'N') {
         const address1 = `${data.basic_details.name},${data.contact_details.business_location.street_no} ${

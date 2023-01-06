@@ -1,5 +1,6 @@
 const express = require('express');
 const { validationMiddleware } = require('../../middlewares');
+const { authRoute } = require('../user/user.controller');
 const {
     getPhoneType,
     getUserAssociationTypes,
@@ -10,11 +11,11 @@ const {
     getLicenseType,
     getLicenseCategory,
     getEntityType,
-    findZip,
     getUserEditableBusiness,
     getAllBusinessList,
     updateUserPreferences,
     registerBusiness,
+    getBusinessDetails,
 } = require('./business.controller');
 const { businessSchema } = require('./business.validation');
 
@@ -22,7 +23,8 @@ const router = express.Router();
 
 // get
 router.get('/getAllBusinessList', validationMiddleware(businessSchema.allBusinessList), getAllBusinessList);
-router.get('/getUserEditableBusiness', validationMiddleware(businessSchema.editableBusinessList), getUserEditableBusiness);
+router.get('/getBusiness/:id', validationMiddleware(businessSchema.findBusiness), getBusinessDetails);
+router.get('/getUserEditableBusiness', authRoute, validationMiddleware(businessSchema.editableBusinessList), getUserEditableBusiness);
 router.get('/phoneType', getPhoneType);
 router.get('/country', getCountry);
 router.get('/states', getAllStates);
@@ -33,9 +35,8 @@ router.get('/entityType', getEntityType);
 router.get('/licenseType', getLicenseType);
 router.get('/licenseCategory', getLicenseCategory);
 
-// add
-router.use('/regBusiness', findZip);
-router.post('/regBusiness', validationMiddleware(businessSchema.newBusiness), registerBusiness);
+// register business
+router.post('/register', authRoute, validationMiddleware(businessSchema.newBusiness), registerBusiness);
 
 // preferences
 router.patch('/updatePreference', validationMiddleware(businessSchema.preferences), updateUserPreferences);
